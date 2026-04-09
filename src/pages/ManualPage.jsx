@@ -1,20 +1,28 @@
+import { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
 import PredictionForm from '../components/PredictionForm'
+import PatientSummary from '../components/PatientSummary'
 import ResultCard from '../components/ResultCard'
 import ExplainabilityChart from '../components/ExplainabilityChart'
 import usePrediction from '../hooks/usePrediction'
 
 export default function ManualPage() {
   const { loading, resultado, error, predecir, reset } = usePrediction()
+  const [datosPaciente, setDatosPaciente] = useState(null)
 
   const handleSubmit = (datos) => {
+    setDatosPaciente(datos)
     predecir(datos, 'manual')
+  }
+
+  const handleReset = () => {
+    reset()
+    setDatosPaciente(null)
   }
 
   return (
     <div className="max-w-2xl mx-auto">
 
-      {/* Encabezado */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-blue-950 mb-1">
           Formulario manual
@@ -24,12 +32,10 @@ export default function ManualPage() {
         </p>
       </div>
 
-      {/* Formulario */}
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
         <PredictionForm onSubmit={handleSubmit} loading={loading} />
       </div>
 
-      {/* Error */}
       {error && (
         <div className="mt-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
           <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={18} />
@@ -40,17 +46,17 @@ export default function ManualPage() {
         </div>
       )}
 
-      {/* Resultado */}
       {resultado && (
         <div className="mt-8 space-y-6">
           <div className="flex justify-end">
             <button
-              onClick={reset}
+              onClick={handleReset}
               className="text-sm text-gray-400 hover:text-gray-600 underline transition-colors"
             >
               Nueva predicción
             </button>
           </div>
+          <PatientSummary paciente={datosPaciente} />
           <ResultCard resultado={resultado} />
           <ExplainabilityChart explicabilidad={resultado.explicabilidad} />
         </div>

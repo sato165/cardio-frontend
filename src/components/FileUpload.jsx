@@ -2,54 +2,41 @@ import { useState, useRef, useEffect } from 'react'
 import { Upload, FileText, X, AlertCircle } from 'lucide-react'
 
 export default function FileUpload({ onSubmit, loading, camposFaltantesExternos = [] }) {
-  const [archivos, setArchivos]           = useState([])
-  const [tipoArchivo, setTipoArchivo]     = useState(null)
-  const [errorTipo, setErrorTipo]         = useState(null)
+  const [archivos, setArchivos]               = useState([])
+  const [tipoArchivo, setTipoArchivo]         = useState(null)
+  const [errorTipo, setErrorTipo]             = useState(null)
   const [valoresManuales, setValoresManuales] = useState({})
   const inputRef = useRef(null)
 
-  // Cuando el backend retorna campos faltantes, resetear los valores manuales
   useEffect(() => {
     if (camposFaltantesExternos.length > 0) setValoresManuales({})
   }, [camposFaltantesExternos])
 
   const validarTipo = (archivo) => {
     if (archivo.type === 'application/json') return 'json'
-    if (archivo.type === 'application/pdf') return 'pdf'
+    if (archivo.type === 'application/pdf')  return 'pdf'
     const ext = archivo.name.split('.').pop().toLowerCase()
     if (ext === 'json') return 'json'
-    if (ext === 'pdf') return 'pdf'
+    if (ext === 'pdf')  return 'pdf'
     return null
   }
 
   const handleArchivos = (nuevos) => {
     setErrorTipo(null)
     const lista = Array.from(nuevos)
-    const tipo = validarTipo(lista[0])
+    const tipo  = validarTipo(lista[0])
 
-    if (!tipo) {
-      setErrorTipo('Solo se aceptan archivos JSON o PDF.')
-      return
-    }
-    if (lista.some(a => validarTipo(a) !== tipo)) {
-      setErrorTipo('No se pueden mezclar archivos JSON y PDF.')
-      return
-    }
-    if (tipo === 'json' && lista.length > 1) {
-      setErrorTipo('Solo se puede subir un archivo JSON a la vez.')
-      return
-    }
-    if (tipo === 'pdf' && lista.length > 5) {
-      setErrorTipo('Se permiten máximo 5 archivos PDF por solicitud.')
-      return
-    }
+    if (!tipo) { setErrorTipo('Solo se aceptan archivos JSON o PDF.'); return }
+    if (lista.some(a => validarTipo(a) !== tipo)) { setErrorTipo('No se pueden mezclar archivos JSON y PDF.'); return }
+    if (tipo === 'json' && lista.length > 1) { setErrorTipo('Solo se puede subir un archivo JSON a la vez.'); return }
+    if (tipo === 'pdf'  && lista.length > 5) { setErrorTipo('Se permiten máximo 5 archivos PDF por solicitud.'); return }
 
     setArchivos(lista)
     setTipoArchivo(tipo)
     setValoresManuales({})
   }
 
-  const handleDrop = (e) => { e.preventDefault(); handleArchivos(e.dataTransfer.files) }
+  const handleDrop     = (e) => { e.preventDefault(); handleArchivos(e.dataTransfer.files) }
   const handleDragOver = (e) => e.preventDefault()
 
   const quitarArchivo = (index) => {
@@ -75,7 +62,6 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
   return (
     <div className="space-y-6">
 
-      {/* Zona de drop */}
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -99,7 +85,6 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
         </p>
       </div>
 
-      {/* Error de tipo */}
       {errorTipo && (
         <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
           <AlertCircle className="text-red-500 shrink-0" size={16} />
@@ -107,7 +92,6 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
         </div>
       )}
 
-      {/* Lista de archivos */}
       {archivos.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs text-gray-400 uppercase tracking-widest font-medium">
@@ -132,7 +116,6 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
         </div>
       )}
 
-      {/* Campos faltantes del backend */}
       {camposFaltantesExternos.length > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-3">
@@ -163,7 +146,6 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
         </div>
       )}
 
-      {/* Botón */}
       {archivos.length > 0 && (
         <button
           onClick={handleSubmit}

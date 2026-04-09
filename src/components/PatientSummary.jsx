@@ -1,0 +1,239 @@
+import { User, Activity, Heart, FlaskConical, Cigarette, Dumbbell } from 'lucide-react'
+
+// ── Helpers de cálculo y etiquetas ───────────────────────────────────────────
+
+function calcularIMC(peso, altura) {
+  if (!peso || !altura) return null
+  return (peso / (altura / 100) ** 2).toFixed(1)
+}
+
+function calcularPulsoPres(apHi, apLo) {
+  if (!apHi || !apLo) return null
+  return apHi - apLo
+}
+
+function categoriaPANombre(apHi, apLo) {
+  if (!apHi || !apLo) return null
+  if (apHi < 120 && apLo < 80)  return 'Normal'
+  if (apHi < 130 && apLo < 80)  return 'Elevada'
+  if (apHi < 140 || apLo < 90)  return 'HTA grado 1'
+  return 'HTA grado 2'
+}
+
+function categoriaPAColor(apHi, apLo) {
+  if (!apHi || !apLo) return 'gray'
+  if (apHi < 120 && apLo < 80)  return 'green'
+  if (apHi < 130 && apLo < 80)  return 'yellow'
+  if (apHi < 140 || apLo < 90)  return 'orange'
+  return 'red'
+}
+
+function categoriaIMCNombre(bmi) {
+  if (!bmi) return null
+  const v = parseFloat(bmi)
+  if (v < 18.5) return 'Bajo peso'
+  if (v < 25)   return 'Normal'
+  if (v < 30)   return 'Sobrepeso'
+  if (v < 35)   return 'Obesidad I'
+  if (v < 40)   return 'Obesidad II'
+  return 'Obesidad III'
+}
+
+function scoreMetabolico(colesterol, gluc, bmi) {
+  if (!colesterol || !gluc || !bmi) return null
+  return (
+    (parseInt(colesterol) > 1 ? 1 : 0) +
+    (parseInt(gluc) > 1 ? 1 : 0) +
+    (parseFloat(bmi) >= 30 ? 1 : 0)
+  )
+}
+
+function nivelColesterol(v) {
+  const map = { '1': 'Normal', '2': 'Por encima de lo normal', '3': 'Muy por encima de lo normal' }
+  return map[String(v)] ?? '-'
+}
+
+function nivelGlucosa(v) {
+  return nivelColesterol(v)
+}
+
+function nombreGenero(v) {
+  return String(v) === '1' ? 'Mujer' : String(v) === '2' ? 'Hombre' : '-'
+}
+
+// ── Sub-componentes visuales ──────────────────────────────────────────────────
+
+function SectionHeader({ icono: Icono, titulo }) {
+  return (
+    <div className="flex items-center gap-2 mb-3">
+      <Icono size={15} className="text-blue-900" />
+      <span className="text-xs font-semibold text-blue-900 uppercase tracking-widest">
+        {titulo}
+      </span>
+    </div>
+  )
+}
+
+function Dato({ label, valor, sub, badge, badgeColor }) {
+  const colores = {
+    green:  'bg-green-100 text-green-800',
+    yellow: 'bg-yellow-100 text-yellow-800',
+    orange: 'bg-orange-100 text-orange-800',
+    red:    'bg-red-100 text-red-700',
+    blue:   'bg-blue-100 text-blue-800',
+    gray:   'bg-gray-100 text-gray-600',
+  }
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs text-gray-400">{label}</span>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-sm font-semibold text-gray-800">{valor ?? '—'}</span>
+        {badge && (
+          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colores[badgeColor] ?? colores.gray}`}>
+            {badge}
+          </span>
+        )}
+        {sub && <span className="text-xs text-gray-400">{sub}</span>}
+      </div>
+    </div>
+  )
+}
+
+function Separador() {
+  return <div className="border-t border-gray-100 my-4" />
+}
+
+// ── Componente principal ──────────────────────────────────────────────────────
+
+/**
+ * PatientSummary
+ *
+ * Props:
+ *   paciente: {
+ *     age_days, age_years (opcional), gender, height, weight,
+ *     ap_hi, ap_lo, cholesterol, gluc, smoke, alco, active
+ *   }
+ *
+ * Acepta age_days (desde upload) o age_years (desde formulario).
+ * Calcula IMC, pulso de presión, categoría PA y score metabólico.
+ */
+export default function PatientSummary({ paciente }) {
+  if (!paciente) return null
+
+  const {
+    age_days, age_years, gender, height, weight,
+    ap_hi, ap_lo, cholesterol, gluc, smoke, alco, active,
+  } = paciente
+
+  // Edad en años — acepta ambos formatos
+  const edad = age_years
+    ? parseFloat(age_years).toFixed(0)
+    : age_days
+      ? (age_days / 365.25).toFixed(0)
+      : null
+
+  const bmi      = calcularIMC(weight, height)
+  const pulso    = calcularPulsoPres(ap_hi, ap_lo)
+  const catPA    = categoriaPANombre(ap_hi, ap_lo)
+  const colorPA  = categoriaPAColor(ap_hi, ap_lo)
+  const catIMC   = categoriaIMCNombre(bmi)
+  const scoreMet = scoreMetabolico(cholesterol, gluc, bmi)
+
+  const scoreColor = scoreMet === 0 ? 'green' : scoreMet === 1 ? 'yellow' : scoreMet === 2 ? 'orange' : 'red'
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+
+      <h3 className="text-base font-semibold text-blue-950 mb-5">
+        Datos del paciente evaluado
+      </h3>
+
+      {/* Datos personales */}
+      <SectionHeader icono={User} titulo="Datos personales" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-2">
+        <Dato label="Edad" valor={edad ? `${edad} años` : null} />
+        <Dato label="Género" valor={nombreGenero(gender)} />
+        <Dato label="Altura" valor={height ? `${height} cm` : null} />
+        <Dato label="Peso" valor={weight ? `${weight} kg` : null} />
+      </div>
+
+      <Separador />
+
+      {/* Presión arterial */}
+      <SectionHeader icono={Heart} titulo="Presión arterial" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-2">
+        <Dato label="Sistólica" valor={ap_hi ? `${ap_hi} mmHg` : null} />
+        <Dato label="Diastólica" valor={ap_lo ? `${ap_lo} mmHg` : null} />
+        <Dato label="Pulso de presión" valor={pulso ? `${pulso} mmHg` : null}
+          sub="(sistólica − diastólica)" />
+        <Dato label="Categoría AHA" valor={catPA}
+          badge={catPA} badgeColor={colorPA} />
+      </div>
+
+      <Separador />
+
+      {/* Exámenes */}
+      <SectionHeader icono={FlaskConical} titulo="Exámenes clínicos" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-2">
+        <Dato label="Colesterol" valor={nivelColesterol(cholesterol)} />
+        <Dato label="Glucosa" valor={nivelGlucosa(gluc)} />
+        <Dato
+          label="IMC"
+          valor={bmi ? `${bmi} kg/m²` : null}
+          badge={catIMC}
+          badgeColor={
+            catIMC === 'Normal' ? 'green' :
+            catIMC === 'Sobrepeso' ? 'yellow' :
+            catIMC === 'Bajo peso' ? 'blue' : 'red'
+          }
+        />
+      </div>
+
+      <Separador />
+
+      {/* Hábitos */}
+      <SectionHeader icono={Cigarette} titulo="Hábitos de vida" />
+      <div className="grid grid-cols-3 gap-4 mb-2">
+        <Dato
+          label="Tabaquismo"
+          valor={smoke === undefined || smoke === null ? '—' : String(smoke) === '1' ? 'Fuma' : 'No fuma'}
+          badge={String(smoke) === '1' ? 'Sí' : 'No'}
+          badgeColor={String(smoke) === '1' ? 'orange' : 'green'}
+        />
+        <Dato
+          label="Alcohol"
+          valor={alco === undefined || alco === null ? '—' : String(alco) === '1' ? 'Consume' : 'No consume'}
+          badge={String(alco) === '1' ? 'Sí' : 'No'}
+          badgeColor={String(alco) === '1' ? 'orange' : 'green'}
+        />
+        <Dato
+          label="Actividad física"
+          valor={active === undefined || active === null ? '—' : String(active) === '1' ? 'Activo' : 'Sedentario'}
+          badge={String(active) === '1' ? 'Sí' : 'No'}
+          badgeColor={String(active) === '1' ? 'green' : 'orange'}
+        />
+      </div>
+
+      <Separador />
+
+      {/* Derivados */}
+      <SectionHeader icono={Activity} titulo="Variables derivadas del modelo" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <Dato label="IMC calculado" valor={bmi ? `${bmi} kg/m²` : null} sub={catIMC} />
+        <Dato label="Pulso de presión" valor={pulso ? `${pulso} mmHg` : null} />
+        <Dato
+          label="Score metabólico"
+          valor={scoreMet !== null ? `${scoreMet} / 3` : null}
+          badge={
+            scoreMet === 0 ? 'Bajo' :
+            scoreMet === 1 ? 'Moderado' :
+            scoreMet === 2 ? 'Alto' : 'Muy alto'
+          }
+          badgeColor={scoreColor}
+        />
+      </div>
+
+    </div>
+  )
+}

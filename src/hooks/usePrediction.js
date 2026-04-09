@@ -6,6 +6,7 @@ export default function usePrediction() {
   const [resultado, setResultado]             = useState(null)
   const [error, setError]                     = useState(null)
   const [camposFaltantes, setCamposFaltantes] = useState([])
+  const [datosPaciente, setDatosPaciente]     = useState(null)
 
   const predecir = async (datos, tipo, camposManuales = {}) => {
     setLoading(true)
@@ -21,10 +22,10 @@ export default function usePrediction() {
         setResultado(respuesta)
       } else if (tipo === 'json') {
         respuesta = await predecirDesdeJson(datos, camposManuales)
-        _procesarUploadOutput(respuesta)
+        _procesarUploadOutput(respuesta, camposManuales)
       } else if (tipo === 'pdf') {
         respuesta = await predecirDesdePdf(datos, camposManuales)
-        _procesarUploadOutput(respuesta)
+        _procesarUploadOutput(respuesta, camposManuales)
       }
     } catch (err) {
       const mensaje =
@@ -37,7 +38,12 @@ export default function usePrediction() {
     }
   }
 
-  const _procesarUploadOutput = (respuesta) => {
+  const _procesarUploadOutput = (respuesta, camposManuales = {}) => {
+    // Combinar datos extraídos del archivo con los que completó el médico
+    const extraidos = respuesta.datos_paciente ?? {}
+    const combinados = { ...extraidos, ...camposManuales }
+    setDatosPaciente(combinados)
+
     if (respuesta.campos_faltantes?.length > 0) {
       setCamposFaltantes(respuesta.campos_faltantes)
     } else if (respuesta.prediccion) {
@@ -49,7 +55,8 @@ export default function usePrediction() {
     setResultado(null)
     setError(null)
     setCamposFaltantes([])
+    setDatosPaciente(null)
   }
 
-  return { loading, resultado, error, camposFaltantes, predecir, reset }
+  return { loading, resultado, error, camposFaltantes, datosPaciente, predecir, reset }
 }

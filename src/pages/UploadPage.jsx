@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
 import FileUpload from '../components/FileUpload'
+import PatientSummary from '../components/PatientSummary'
 import ResultCard from '../components/ResultCard'
 import ExplainabilityChart from '../components/ExplainabilityChart'
 import usePrediction from '../hooks/usePrediction'
 
 export default function UploadPage() {
-  const { loading, resultado, error, camposFaltantes, predecir, reset } = usePrediction()
+  const { loading, resultado, error, camposFaltantes, datosPaciente, predecir, reset } = usePrediction()
   const [uploadKey, setUploadKey] = useState(0)
 
   const handleSubmit = (archivos, tipo, camposManuales) => {
@@ -19,7 +20,7 @@ export default function UploadPage() {
 
   const handleReset = () => {
     reset()
-    setUploadKey(k => k + 1) // fuerza remontaje de FileUpload limpiando su estado
+    setUploadKey(k => k + 1)
   }
 
   return (
@@ -64,6 +65,7 @@ export default function UploadPage() {
               Nueva predicción
             </button>
           </div>
+          <PatientSummary paciente={datosPaciente} />
           <ResultCard resultado={resultado} />
           <ExplainabilityChart explicabilidad={resultado.explicabilidad} />
         </div>
