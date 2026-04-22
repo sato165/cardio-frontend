@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Info } from 'lucide-react'
+import { Info, Send, User, Heart, FlaskConical, Dumbbell, ArrowRight } from 'lucide-react'
 
 const CAMPOS_INICIALES = {
   age_years: '', gender: '', height: '', weight: '',
@@ -9,14 +9,14 @@ const CAMPOS_INICIALES = {
 
 function InputField({ label, name, type = 'number', value, onChange, error, hint, min, max, tooltip }) {
   return (
-    <div>
-      <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+    <div className="space-y-1.5">
+      <label className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
         {label}
-        {hint && <span className="text-xs text-gray-400 font-normal">({hint})</span>}
+        {hint && <span className="text-xs text-slate-500 font-normal">({hint})</span>}
         {tooltip && (
           <span className="group relative ml-1 cursor-help">
-            <Info size={13} className="text-gray-400" />
-            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 bg-gray-800 text-white text-xs rounded-lg px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 leading-relaxed">
+            <Info size={13} className="text-slate-500" />
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 bg-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 leading-relaxed border border-slate-700">
               {tooltip}
             </span>
           </span>
@@ -29,25 +29,25 @@ function InputField({ label, name, type = 'number', value, onChange, error, hint
         onChange={onChange}
         min={min}
         max={max}
-        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-900 transition-colors ${
-          error ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-white'
+        className={`w-full px-4 py-3 rounded-xl input-glass text-sm transition-all ${
+          error ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'
         }`}
       />
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
     </div>
   )
 }
 
 function SelectField({ label, name, value, onChange, options, error, hint, tooltip }) {
   return (
-    <div>
-      <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1">
+    <div className="space-y-1.5">
+      <label className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
         {label}
-        {hint && <span className="text-xs text-gray-400 font-normal">({hint})</span>}
+        {hint && <span className="text-xs text-slate-500 font-normal">({hint})</span>}
         {tooltip && (
           <span className="group relative ml-1 cursor-help">
-            <Info size={13} className="text-gray-400" />
-            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-52 bg-gray-800 text-white text-xs rounded-lg px-2 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 leading-relaxed">
+            <Info size={13} className="text-slate-500" />
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 bg-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 leading-relaxed border border-slate-700">
               {tooltip}
             </span>
           </span>
@@ -57,8 +57,8 @@ function SelectField({ label, name, value, onChange, options, error, hint, toolt
         name={name}
         value={value}
         onChange={onChange}
-        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-900 transition-colors ${
-          error ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-white'
+        className={`w-full px-4 py-3 rounded-xl select-glass text-sm transition-all ${
+          error ? 'border-red-500 focus:border-red-500' : 'focus:border-blue-500'
         }`}
       >
         <option value="">Seleccionar...</option>
@@ -66,16 +66,20 @@ function SelectField({ label, name, value, onChange, options, error, hint, toolt
           <option key={op.value} value={op.value}>{op.label}</option>
         ))}
       </select>
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
     </div>
   )
 }
 
-function SectionTitle({ children }) {
+function SectionTitle({ children, icono: Icon }) {
   return (
-    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4 pb-2 border-b border-gray-100">
-      {children}
-    </h3>
+    <div className="flex items-center gap-2 mb-5">
+      {Icon && <Icon size={16} className="text-blue-400" />}
+      <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+        {children}
+      </h3>
+      <div className="flex-1 h-px bg-gradient-to-r from-slate-700/50 to-transparent" />
+    </div>
   )
 }
 
@@ -152,10 +156,9 @@ export default function PredictionForm({ onSubmit, loading }) {
     <form onSubmit={handleSubmit} noValidate>
       <div className="space-y-8">
 
-        {/* Datos personales */}
         <div>
-          <SectionTitle>Datos personales</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SectionTitle icono={User}>Datos personales</SectionTitle>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <InputField label="Edad" name="age_years" value={campos.age_years}
               onChange={handleChange} error={errores.age_years} hint="años" min={18} max={109} />
             <SelectField label="Género" name="gender" value={campos.gender}
@@ -168,10 +171,9 @@ export default function PredictionForm({ onSubmit, loading }) {
           </div>
         </div>
 
-        {/* Presión arterial */}
         <div>
-          <SectionTitle>Presión arterial</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SectionTitle icono={Heart}>Presión arterial</SectionTitle>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <InputField label="Presión sistólica" name="ap_hi" value={campos.ap_hi}
               onChange={handleChange} error={errores.ap_hi} hint="mmHg" min={60} max={250}
               tooltip="Presión máxima durante el latido. Rango aceptado: 60–250 mmHg." />
@@ -181,10 +183,9 @@ export default function PredictionForm({ onSubmit, loading }) {
           </div>
         </div>
 
-        {/* Exámenes clínicos */}
         <div>
-          <SectionTitle>Exámenes clínicos</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SectionTitle icono={FlaskConical}>Exámenes clínicos</SectionTitle>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <SelectField label="Colesterol" name="cholesterol" value={campos.cholesterol}
               onChange={handleChange} error={errores.cholesterol} options={opcionesNivel}
               tooltip="Normal: < 200 mg/dL · Por encima: 200–239 mg/dL · Muy por encima: ≥ 240 mg/dL" />
@@ -194,10 +195,9 @@ export default function PredictionForm({ onSubmit, loading }) {
           </div>
         </div>
 
-        {/* Hábitos de vida */}
         <div>
-          <SectionTitle>Hábitos de vida</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <SectionTitle icono={Dumbbell}>Hábitos de vida</SectionTitle>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <SelectField label="Tabaquismo" name="smoke" value={campos.smoke}
               onChange={handleChange} error={errores.smoke}
               options={[{ value: '1', label: 'Fuma' }, { value: '0', label: 'No fuma' }]}
@@ -214,13 +214,24 @@ export default function PredictionForm({ onSubmit, loading }) {
 
       </div>
 
-      <div className="mt-8">
+      <div className="mt-10">
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 px-6 bg-blue-950 text-white font-semibold rounded-lg hover:bg-blue-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full py-4 px-6 rounded-xl btn-primary flex items-center justify-center gap-3 text-base"
         >
-          {loading ? 'Procesando...' : 'Predecir riesgo cardiovascular'}
+          {loading ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Procesando predicción...</span>
+            </>
+          ) : (
+            <>
+              <Send size={18} />
+              <span>Predecir riesgo cardiovascular</span>
+              <ArrowRight size={18} />
+            </>
+          )}
         </button>
       </div>
     </form>

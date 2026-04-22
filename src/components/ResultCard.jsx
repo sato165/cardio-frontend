@@ -1,36 +1,45 @@
-import { ShieldCheck, ShieldAlert, AlertTriangle } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ShieldCheck, ShieldAlert, AlertTriangle, Activity } from 'lucide-react'
 
 const CONFIG_RIESGO = {
   Alto: {
     color: 'red',
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    texto: 'text-red-700',
-    barra: 'bg-red-500',
+    bg: 'bg-red-500/10',
+    border: 'border-red-500/30',
+    text: 'text-red-400',
+    textLight: 'text-red-300',
+    barra: 'bg-gradient-to-r from-red-500 to-red-600',
     icono: ShieldAlert,
     descripcion: 'El paciente presenta alto riesgo de enfermedad cardiovascular. Se recomienda evaluación clínica inmediata.',
+    glow: 'shadow-red-500/20',
   },
   Moderado: {
     color: 'yellow',
-    bg: 'bg-yellow-50',
-    border: 'border-yellow-200',
-    texto: 'text-yellow-700',
-    barra: 'bg-yellow-500',
+    bg: 'bg-yellow-500/10',
+    border: 'border-yellow-500/30',
+    text: 'text-yellow-400',
+    textLight: 'text-yellow-300',
+    barra: 'bg-gradient-to-r from-yellow-500 to-orange-500',
     icono: AlertTriangle,
     descripcion: 'El paciente presenta riesgo moderado. Se recomienda seguimiento y control de factores de riesgo.',
+    glow: 'shadow-yellow-500/20',
   },
   Bajo: {
     color: 'green',
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    texto: 'text-green-700',
-    barra: 'bg-green-500',
+    bg: 'bg-green-500/10',
+    border: 'border-green-500/30',
+    text: 'text-green-400',
+    textLight: 'text-green-300',
+    barra: 'bg-gradient-to-r from-green-500 to-emerald-500',
     icono: ShieldCheck,
     descripcion: 'El paciente presenta bajo riesgo cardiovascular. Se recomienda mantener hábitos saludables.',
+    glow: 'shadow-green-500/20',
   },
 }
 
 export default function ResultCard({ resultado }) {
+  const [animatedWidth, setAnimatedWidth] = useState(0)
+  
   if (!resultado) return null
 
   const { nivel_riesgo, probabilidad } = resultado
@@ -38,48 +47,64 @@ export default function ResultCard({ resultado }) {
   const Icono = cfg.icono
   const pct = Math.round(probabilidad * 100)
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedWidth(pct)
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [pct])
+
   return (
-    <div className={`rounded-2xl border ${cfg.border} ${cfg.bg} p-6`}>
+    <div className={`rounded-3xl border ${cfg.border} ${cfg.bg} p-6 shadow-xl ${cfg.glow} animate-scale-in`}>
 
-      {/* Encabezado */}
-      <div className="flex items-center gap-3 mb-5">
-        <Icono className={cfg.texto} size={28} />
-        <div>
-          <p className="text-xs text-gray-500 uppercase tracking-widest font-medium">
-            Resultado de la predicción
-          </p>
-          <h2 className={`text-2xl font-bold ${cfg.texto}`}>
-            Riesgo {nivel_riesgo}
-          </h2>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div className={`p-4 rounded-2xl glass-card border ${cfg.border}`}>
+            <Icono className={cfg.text} size={28} />
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 uppercase tracking-widest font-medium">
+              Resultado de la predicción
+            </p>
+            <h2 className={`text-2xl font-bold ${cfg.text}`}>
+              Riesgo {nivel_riesgo}
+            </h2>
+          </div>
         </div>
-      </div>
-
-      {/* Barra de probabilidad */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-sm text-gray-600 font-medium">
-            Probabilidad de riesgo cardiovascular
-          </span>
-          <span className={`text-2xl font-bold ${cfg.texto}`}>
+        
+        <div className="text-right">
+          <div className="text-xs text-slate-500 mb-1">Probabilidad</div>
+          <div className={`text-4xl font-bold ${cfg.text}`}>
             {pct}%
-          </span>
-        </div>
-        <div className="h-3 bg-white rounded-full border border-gray-200 overflow-hidden">
-          <div
-            className={`h-full ${cfg.barra} rounded-full transition-all duration-700`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-        <div className="flex justify-between mt-1">
-          <span className="text-xs text-gray-400">0%</span>
-          <span className="text-xs text-gray-400">100%</span>
+          </div>
         </div>
       </div>
 
-      {/* Descripción clínica */}
-      <p className="text-sm text-gray-600 border-t border-white/60 pt-4 mt-4 leading-relaxed">
-        {cfg.descripcion}
-      </p>
+      <div className="relative mb-6">
+        <div className="h-4 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+          <div
+            className={`h-full ${cfg.barra} rounded-full progress-bar-animated relative overflow-hidden`}
+            style={{ width: `${animatedWidth}%` }}
+          >
+            <div className="absolute inset-0 bg-white/20 animate-shimmer" />
+          </div>
+        </div>
+        
+        <div className="flex justify-between mt-2">
+          <span className="text-xs text-slate-600">0%</span>
+          <span className="text-xs text-slate-600">25%</span>
+          <span className="text-xs text-slate-600">50%</span>
+          <span className="text-xs text-slate-600">75%</span>
+          <span className="text-xs text-slate-600">100%</span>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3 pt-4 border-t border-white/10">
+        <Activity className={`${cfg.text} shrink-0 mt-0.5`} size={18} />
+        <p className={`text-sm ${cfg.textLight} leading-relaxed`}>
+          {cfg.descripcion}
+        </p>
+      </div>
 
     </div>
   )
