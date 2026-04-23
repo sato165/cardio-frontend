@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Heart, ClipboardList, Upload, Info, Activity } from 'lucide-react'
+import { HeartPulse, ClipboardList, Upload, Info, Activity } from 'lucide-react'
 
 export default function Navbar() {
   const { pathname } = useLocation()
@@ -20,15 +20,15 @@ export default function Navbar() {
           className="flex items-center gap-3 group"
         >
           <div className="relative">
-            <Heart 
-              className="text-red-500 animate-heartbeat" 
-              size={24} 
-              fill="currentColor" 
+            <HeartPulse
+              className="text-red-500 animate-heartbeat"
+              size={24}
+              fill="currentColor"
             />
             <div className="absolute inset-0 bg-red-500 blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
           </div>
           <span className="text-white font-bold text-lg tracking-tight">
-            Cardio<span className="text-red-500">Predict</span>
+            Artery<span className="text-red-500">-VA</span>
           </span>
         </Link>
 

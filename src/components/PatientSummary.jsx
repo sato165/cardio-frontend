@@ -59,10 +59,11 @@ function nombreGenero(v) {
   return String(v) === '1' ? 'Mujer' : String(v) === '2' ? 'Hombre' : '-'
 }
 
-function SectionHeader({ titulo, icono: Icono }) {
+function SectionHeader({ titulo, icono }) {
+  const IconComponent = icono
   return (
     <div className="flex items-center gap-2 mb-4">
-      <Icono size={16} className="text-blue-400" />
+      <IconComponent size={16} className="text-blue-400" />
       <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
         {titulo}
       </span>

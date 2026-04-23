@@ -1,4 +1,4 @@
-import { Heart, Shield, FileText, Users, Brain, BarChart2, AlertTriangle, CheckCircle, Cpu, Activity, Database } from 'lucide-react'
+import { Heart, HeartPulse, Shield, FileText, Users, Brain, BarChart2, AlertTriangle, CheckCircle, Cpu, Activity, Database } from 'lucide-react'
 
 function SectionTitle({ children }) {
   return (
@@ -27,9 +27,9 @@ function MetricCard({ valor, label, sub, color = 'blue' }) {
 function FeatureRow({ icono, titulo, descripcion }) {
   const Icono = icono
   return (
-    <div className="flex items-start gap-4 py-4 border-b border-white/5 last:border-0">
-      <div className="p-2.5 bg-blue-500/10 rounded-xl shrink-0">
-        <Icono size={18} className="text-blue-400" />
+    <div className="flex items-start gap-5 py-4 border-b border-white/5 last:border-0">
+      <div className="p-4 bg-blue-500/10 rounded-xl shrink-0">
+        <Icono size={20} className="text-blue-400" />
       </div>
       <div>
         <p className="text-sm font-semibold text-slate-200 mb-1">{titulo}</p>
@@ -116,12 +116,12 @@ export default function AboutPage() {
       <div className="text-center pt-4 animate-slide-up">
         <div className="relative inline-block mb-6">
           <div className="absolute inset-0 bg-red-500/20 rounded-full blur-2xl" />
-          <div className="relative p-5 rounded-3xl glass-card">
-            <Heart className="text-red-500 animate-heartbeat" size={40} fill="currentColor" />
-          </div>
+        <div className="relative p-5 rounded-3xl glass-card">
+          <HeartPulse className="text-red-500 animate-heartbeat heart-glow" size={40} fill="currentColor" strokeWidth={2} />
+        </div>
         </div>
         <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">
-          Cardio<span className="text-gradient-red">Predict</span>
+          Artery<span className="text-gradient-red">-VA</span>
         </h1>
         <p className="text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
           Sistema de predicción de riesgo cardiovascular con explicabilidad clínica
@@ -342,21 +342,16 @@ export default function AboutPage() {
 
       <section className="animate-slide-up delay-500">
         <SectionTitle><Users size={20} className="text-blue-400" /> Equipo de desarrollo</SectionTitle>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <TeamCard
             nombre="Sebastián Torres Ortega"
-            rol="Desarrollo backend y frontend"
+            rol="Desarrollo backend y frontend, Investigación y documentación"
             area="Ingeniería de Sistemas"
           />
           <TeamCard
             nombre="Mayerlis Acosta Peralta"
             rol="Investigación y validación clínica"
             area="Ingeniería Biomédica"
-          />
-          <TeamCard
-            nombre="Christian Rivera Dibasto"
-            rol="Investigación y documentación"
-            area="Ingeniería de Sistemas"
           />
         </div>
       </section>

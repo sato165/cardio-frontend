@@ -39,13 +39,11 @@ const CONFIG_RIESGO = {
 
 export default function ResultCard({ resultado }) {
   const [animatedWidth, setAnimatedWidth] = useState(0)
-  
-  if (!resultado) return null
 
-  const { nivel_riesgo, probabilidad } = resultado
+  const { nivel_riesgo, probabilidad } = resultado || {}
   const cfg = CONFIG_RIESGO[nivel_riesgo] ?? CONFIG_RIESGO['Moderado']
   const Icono = cfg.icono
-  const pct = Math.round(probabilidad * 100)
+  const pct = Math.round((probabilidad || 0) * 100)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -53,6 +51,8 @@ export default function ResultCard({ resultado }) {
     }, 100)
     return () => clearTimeout(timer)
   }, [pct])
+
+  if (!resultado) return null
 
   return (
     <div className={`rounded-3xl border ${cfg.border} ${cfg.bg} p-6 shadow-xl ${cfg.glow} animate-scale-in`}>

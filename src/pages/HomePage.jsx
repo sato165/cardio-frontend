@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { ClipboardList, Upload, Heart, ShieldCheck, FileText, Sparkles, ArrowRight, Cpu, Activity } from 'lucide-react'
+import { ClipboardList, Upload, HeartPulse, ShieldCheck, FileText, Sparkles, ArrowRight, Cpu, Activity } from 'lucide-react'
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -17,12 +17,12 @@ export default function HomePage() {
         <div className="relative inline-block mb-6 stagger-1">
           <div className="absolute inset-0 bg-red-500/30 rounded-full blur-xl animate-pulse" />
           <div className="relative p-6 rounded-3xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-white/10 glass-card">
-            <Heart className="text-red-500 animate-heartbeat" size={56} fill="currentColor" />
+            <HeartPulse className="text-red-500 animate-heartbeat" size={56} fill="currentColor" />
           </div>
         </div>
         
         <h1 className="text-5xl font-bold text-white mb-4 tracking-tight stagger-2">
-          Cardio<span className="text-gradient-red">Predict</span>
+          Artery<span className="text-gradient-red">-VA</span>
         </h1>
         <p className="text-slate-400 text-lg max-w-xl mx-auto leading-relaxed stagger-3">
           Sistema de predicción de riesgo cardiovascular con inteligencia artificial 
