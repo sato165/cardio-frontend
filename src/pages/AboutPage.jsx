@@ -341,6 +341,50 @@ export default function AboutPage() {
       </section>
 
       <section className="animate-slide-up delay-500">
+        <SectionTitle><Activity size={20} className="text-blue-400" /> Modelos de riesgo comparados</SectionTitle>
+        <div className="glass-card border border-white/5 rounded-2xl p-6 space-y-5">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-blue-500/10 rounded-xl shrink-0">
+              <Cpu size={20} className="text-blue-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-slate-200">CardioPredict (Modelo propio)</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                XGBoost entrenado con 68k registros y 16 features (incluyendo ingeniería clínica). 
+                AUC-ROC 0.799. Usa variables categóricas ordinales para colesterol y glucosa (1/2/3).
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-red-500/10 rounded-xl shrink-0">
+              <Heart size={20} className="text-red-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-slate-200">Framingham 2008 (D'Agostino)</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Ecuación de riesgo general a 10 años desarrollada en cohorte de Framingham, Massachusetts. 
+                Utiliza edad, colesterol total, HDL, presión sistólica, tabaquismo, diabetes y tratamiento antihipertensivo. 
+                Validada internacionalmente pero tiende a sobreestimar el riesgo en poblaciones latinoamericanas.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-yellow-500/10 rounded-xl shrink-0">
+              <Shield size={20} className="text-yellow-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-slate-200">Sociedad Colombiana de Cardiología (SCC)</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Ajuste del puntaje de Framingham por un factor de 0.75 para corregir la sobreestimación en población colombiana, 
+                según validación de Muñoz et al. (Rev Col Cardiol 2014) y la Guía de dislipidemias del Ministerio de Salud. 
+                Se aplica el mismo umbral: Bajo &lt;10%, Moderado 10-20%, Alto &gt;20%.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="animate-slide-up delay-500">
         <SectionTitle><Users size={20} className="text-blue-400" /> Equipo de desarrollo</SectionTitle>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <TeamCard

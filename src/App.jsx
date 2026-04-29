@@ -5,6 +5,7 @@ import EkgBackground from './components/EkgBackground'
 import HomePage from './pages/HomePage'
 import ManualPage from './pages/ManualPage'
 import UploadPage from './pages/UploadPage'
+import RiskModelsPage from './pages/RiskModelsPage' 
 import AboutPage from './pages/AboutPage'
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/manual" element={<ManualPage />} />
               <Route path="/upload" element={<UploadPage />} />
+              <Route path="/models" element={<RiskModelsPage />} />
               <Route path="/about" element={<AboutPage />} />
             </Routes>
           </div>

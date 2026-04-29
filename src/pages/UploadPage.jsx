@@ -4,6 +4,7 @@ import FileUpload from '../components/FileUpload'
 import PatientSummary from '../components/PatientSummary'
 import ResultCard from '../components/ResultCard'
 import ExplainabilityChart from '../components/ExplainabilityChart'
+import ComparisonCard from '../components/ComparisonCard'
 import usePrediction from '../hooks/usePrediction'
 
 export default function UploadPage() {
@@ -68,6 +69,15 @@ export default function UploadPage() {
           </div>
           <PatientSummary paciente={datosPaciente} />
           <ResultCard resultado={resultado} />
+
+          {resultado.riesgo_comparativo && (
+            <ComparisonCard
+              riesgoComparativo={resultado.riesgo_comparativo}
+              probabilidadPropia={resultado.probabilidad}
+              nivelPropio={resultado.nivel_riesgo}
+            />
+          )}
+
           <ExplainabilityChart explicabilidad={resultado.explicabilidad} />
         </div>
       )}

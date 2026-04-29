@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { HeartPulse, ClipboardList, Upload, Info, Activity } from 'lucide-react'
+import { HeartPulse, ClipboardList, Upload, Info, Activity, BookOpen } from 'lucide-react'
 
 export default function Navbar() {
   const { pathname } = useLocation()
@@ -51,6 +51,16 @@ export default function Navbar() {
               )}
             </div>
             <span>Historial</span>
+          </Link>
+          
+          <Link to="/models" className={linkClass('/models')}>
+            <div className="relative">
+              <BookOpen size={18} />
+              {pathname === '/models' && (
+                <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-yellow-500 rounded-full" />
+              )}
+            </div>
+            <span>Modelos</span>
           </Link>
           
           <Link to="/about" className={linkClass('/about')}>

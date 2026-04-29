@@ -4,6 +4,7 @@ import PredictionForm from '../components/PredictionForm'
 import PatientSummary from '../components/PatientSummary'
 import ResultCard from '../components/ResultCard'
 import ExplainabilityChart from '../components/ExplainabilityChart'
+import ComparisonCard from '../components/ComparisonCard'
 import usePrediction from '../hooks/usePrediction'
 
 export default function ManualPage() {
@@ -59,6 +60,15 @@ export default function ManualPage() {
           </div>
           <PatientSummary paciente={datosPaciente} />
           <ResultCard resultado={resultado} />
+
+          {resultado.riesgo_comparativo && (
+            <ComparisonCard
+              riesgoComparativo={resultado.riesgo_comparativo}
+              probabilidadPropia={resultado.probabilidad}
+              nivelPropio={resultado.nivel_riesgo}
+            />
+          )}
+
           <ExplainabilityChart explicabilidad={resultado.explicabilidad} />
         </div>
       )}

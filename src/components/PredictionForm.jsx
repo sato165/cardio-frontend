@@ -5,6 +5,8 @@ const CAMPOS_INICIALES = {
   age_years: '', gender: '', height: '', weight: '',
   ap_hi: '', ap_lo: '', cholesterol: '', gluc: '',
   smoke: '', alco: '', active: '',
+  // Nuevos campos Framingham (opcionales)
+  colesterol_total_mgdl: '', hdl_mgdl: '', diabetes: '', tratamiento_antihipertensivo: '',
 }
 
 function InputField({ label, name, type = 'number', value, onChange, error, hint, min, max, tooltip }) {
@@ -111,6 +113,16 @@ function validar(campos) {
   if (campos.alco === '') errores.alco = 'Campo requerido'
   if (campos.active === '') errores.active = 'Campo requerido'
 
+  // Los nuevos campos NO son requeridos, solo validamos rangos si tienen valor
+  if (campos.colesterol_total_mgdl !== '') {
+    if (n(campos.colesterol_total_mgdl) < 50 || n(campos.colesterol_total_mgdl) > 500)
+      errores.colesterol_total_mgdl = 'Debe estar entre 50 y 500 mg/dL'
+  }
+  if (campos.hdl_mgdl !== '') {
+    if (n(campos.hdl_mgdl) < 15 || n(campos.hdl_mgdl) > 120)
+      errores.hdl_mgdl = 'Debe estar entre 15 y 120 mg/dL'
+  }
+
   return errores
 }
 
@@ -131,7 +143,7 @@ export default function PredictionForm({ onSubmit, loading }) {
       setErrores(nuevosErrores)
       return
     }
-    onSubmit({
+    const payload = {
       age_days:    Math.round(parseFloat(campos.age_years) * 365.25),
       gender:      parseInt(campos.gender),
       height:      parseInt(campos.height),
@@ -143,7 +155,14 @@ export default function PredictionForm({ onSubmit, loading }) {
       smoke:       parseInt(campos.smoke),
       alco:        parseInt(campos.alco),
       active:      parseInt(campos.active),
-    })
+    }
+    // Agregar opcionales si tienen valor
+    if (campos.colesterol_total_mgdl !== '') payload.colesterol_total_mgdl = parseFloat(campos.colesterol_total_mgdl)
+    if (campos.hdl_mgdl !== '') payload.hdl_mgdl = parseFloat(campos.hdl_mgdl)
+    if (campos.diabetes !== '') payload.diabetes = parseInt(campos.diabetes)
+    if (campos.tratamiento_antihipertensivo !== '') payload.tratamiento_antihipertensivo = parseInt(campos.tratamiento_antihipertensivo)
+
+    onSubmit(payload)
   }
 
   const opcionesNivel = [
@@ -209,6 +228,56 @@ export default function PredictionForm({ onSubmit, loading }) {
             <SelectField label="Actividad física" name="active" value={campos.active}
               onChange={handleChange} error={errores.active}
               options={[{ value: '1', label: 'Activo' }, { value: '0', label: 'Sedentario' }]} />
+          </div>
+        </div>
+
+        {/* ─── Nueva sección: Framingham opcional ─── */}
+        <div>
+          <SectionTitle icono={FlaskConical}>Datos para Framingham (opcionales)</SectionTitle>
+          <p className="text-xs text-slate-500 mb-4 -mt-3">
+            Estos datos permiten calcular el riesgo cardiovascular según Framingham 2008 y el ajuste de la Sociedad Colombiana de Cardiología. Si no se completan, solo se mostrará la predicción del modelo propio.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <InputField
+              label="Colesterol total"
+              name="colesterol_total_mgdl"
+              value={campos.colesterol_total_mgdl}
+              onChange={handleChange}
+              hint="mg/dL"
+              min={50} max={500}
+              tooltip="Colesterol total en mg/dL. Necesario para Framingham."
+            />
+            <InputField
+              label="Colesterol HDL"
+              name="hdl_mgdl"
+              value={campos.hdl_mgdl}
+              onChange={handleChange}
+              hint="mg/dL"
+              min={15} max={120}
+              tooltip="Colesterol HDL en mg/dL. Necesario para Framingham."
+            />
+            <SelectField
+              label="Diabetes"
+              name="diabetes"
+              value={campos.diabetes}
+              onChange={handleChange}
+              options={[
+                { value: '1', label: 'Sí' },
+                { value: '0', label: 'No' },
+              ]}
+              tooltip="Diagnóstico de diabetes mellitus."
+            />
+            <SelectField
+              label="Tto. antihipertensivo"
+              name="tratamiento_antihipertensivo"
+              value={campos.tratamiento_antihipertensivo}
+              onChange={handleChange}
+              options={[
+                { value: '1', label: 'Sí' },
+                { value: '0', label: 'No' },
+              ]}
+              tooltip="¿El paciente recibe tratamiento antihipertensivo actualmente?"
+            />
           </div>
         </div>
 

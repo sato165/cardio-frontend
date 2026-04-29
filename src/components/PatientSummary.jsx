@@ -170,6 +170,29 @@ export default function PatientSummary({ paciente }) {
               catIMC === 'Bajo peso' ? 'blue' : 'red'
             }
           />
+                    {/* ─── Nuevos campos Framingham ─── */}
+          {paciente.colesterol_total_mgdl !== undefined && paciente.colesterol_total_mgdl !== null && (
+            <Dato label="Colesterol total" valor={`${paciente.colesterol_total_mgdl} mg/dL`} />
+          )}
+          {paciente.hdl_mgdl !== undefined && paciente.hdl_mgdl !== null && (
+            <Dato label="HDL" valor={`${paciente.hdl_mgdl} mg/dL`} />
+          )}
+          {paciente.diabetes !== undefined && paciente.diabetes !== null && (
+            <Dato
+              label="Diabetes"
+              valor={String(paciente.diabetes) === '1' ? 'Sí' : 'No'}
+              badge={String(paciente.diabetes) === '1' ? 'Sí' : 'No'}
+              badgeColor={String(paciente.diabetes) === '1' ? 'orange' : 'green'}
+            />
+          )}
+          {paciente.tratamiento_antihipertensivo !== undefined && paciente.tratamiento_antihipertensivo !== null && (
+            <Dato
+              label="Tto. antihipertensivo"
+              valor={String(paciente.tratamiento_antihipertensivo) === '1' ? 'Sí' : 'No'}
+              badge={String(paciente.tratamiento_antihipertensivo) === '1' ? 'Sí' : 'No'}
+              badgeColor={String(paciente.tratamiento_antihipertensivo) === '1' ? 'orange' : 'green'}
+            />
+          )}
         </div>
 
         <Separador />
