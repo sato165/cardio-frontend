@@ -378,3 +378,7 @@ body {
 .progress-bar-animated {
   transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.ekg-path {
+  mix-blend-mode: screen;
+}
