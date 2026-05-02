@@ -1,29 +1,39 @@
-import { useState } from 'react'
 import { AlertCircle, RotateCcw } from 'lucide-react'
 import PredictionForm from '../components/PredictionForm'
 import PatientSummary from '../components/PatientSummary'
 import ResultCard from '../components/ResultCard'
 import ExplainabilityChart from '../components/ExplainabilityChart'
 import ComparisonCard from '../components/ComparisonCard'
-import usePrediction from '../hooks/usePrediction'
+import { usePredictionContext } from '../context/PredictionContext'
+import { predecirManual } from '../api/cardioApi'
 
 export default function ManualPage() {
-  const { loading, resultado, error, predecir, reset } = usePrediction()
-  const [datosPaciente, setDatosPaciente] = useState(null)
+  const { state, dispatch, ActionTypes } = usePredictionContext()
+  const { loading, result, error, patientData } = state.manual
 
-  const handleSubmit = (datos) => {
-    setDatosPaciente(datos)
-    predecir(datos, 'manual')
+  const handleSubmit = async (datos) => {
+    dispatch({ type: ActionTypes.SET_MANUAL_PATIENT, payload: datos })
+    dispatch({ type: ActionTypes.SET_MANUAL_LOADING, payload: true })
+    dispatch({ type: ActionTypes.SET_MANUAL_ERROR, payload: null })
+    try {
+      const res = await predecirManual(datos)
+      dispatch({ type: ActionTypes.SET_MANUAL_RESULT, payload: res })
+    } catch (err) {
+      const msg = err.response?.data?.detalle?.[0]?.mensaje ??
+                  err.response?.data?.error ??
+                  'Error al conectar con el servidor.'
+      dispatch({ type: ActionTypes.SET_MANUAL_ERROR, payload: msg })
+    } finally {
+      dispatch({ type: ActionTypes.SET_MANUAL_LOADING, payload: false })
+    }
   }
 
   const handleReset = () => {
-    reset()
-    setDatosPaciente(null)
+    dispatch({ type: ActionTypes.RESET_MANUAL })
   }
 
   return (
     <div className="max-w-2xl mx-auto">
-
       <div className="mb-8 animate-slide-up">
         <h1 className="text-3xl font-bold text-white mb-2">
           Formulario Manual
@@ -47,7 +57,7 @@ export default function ManualPage() {
         </div>
       )}
 
-      {resultado && (
+      {result && (
         <div className="mt-8 space-y-6">
           <div className="flex justify-end animate-fade-in">
             <button
@@ -58,21 +68,20 @@ export default function ManualPage() {
               Nueva predicción
             </button>
           </div>
-          <PatientSummary paciente={datosPaciente} />
-          <ResultCard resultado={resultado} />
+          <PatientSummary paciente={patientData} />
+          <ResultCard resultado={result} />
 
-          {resultado.riesgo_comparativo && (
+          {result.riesgo_comparativo && (
             <ComparisonCard
-              riesgoComparativo={resultado.riesgo_comparativo}
-              probabilidadPropia={resultado.probabilidad}
-              nivelPropio={resultado.nivel_riesgo}
+              riesgoComparativo={result.riesgo_comparativo}
+              probabilidadPropia={result.probabilidad}
+              nivelPropio={result.nivel_riesgo}
             />
           )}
 
-          <ExplainabilityChart explicabilidad={resultado.explicabilidad} />
+          <ExplainabilityChart explicabilidad={result.explicabilidad} />
         </div>
       )}
-
     </div>
   )
 }

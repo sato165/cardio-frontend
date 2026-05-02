@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Info, Send, User, Heart, FlaskConical, Dumbbell, ArrowRight } from 'lucide-react'
+import { usePredictionContext } from '../context/PredictionContext'
 
 const CAMPOS_INICIALES = {
   age_years: '', gender: '', height: '', weight: '',
   ap_hi: '', ap_lo: '', cholesterol: '', gluc: '',
   smoke: '', alco: '', active: '',
-  // Nuevos campos Framingham (opcionales)
   colesterol_total_mgdl: '', hdl_mgdl: '', diabetes: '', tratamiento_antihipertensivo: '',
 }
 
@@ -113,7 +113,6 @@ function validar(campos) {
   if (campos.alco === '') errores.alco = 'Campo requerido'
   if (campos.active === '') errores.active = 'Campo requerido'
 
-  // Los nuevos campos NO son requeridos, solo validamos rangos si tienen valor
   if (campos.colesterol_total_mgdl !== '') {
     if (n(campos.colesterol_total_mgdl) < 50 || n(campos.colesterol_total_mgdl) > 500)
       errores.colesterol_total_mgdl = 'Debe estar entre 50 y 500 mg/dL'
@@ -127,12 +126,13 @@ function validar(campos) {
 }
 
 export default function PredictionForm({ onSubmit, loading }) {
-  const [campos, setCampos] = useState(CAMPOS_INICIALES)
+  const { state, dispatch, ActionTypes } = usePredictionContext()
+  const campos = state.manual.fields
   const [errores, setErrores] = useState({})
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setCampos(prev => ({ ...prev, [name]: value }))
+    dispatch({ type: ActionTypes.SET_MANUAL_FIELDS, payload: { ...campos, [name]: value } })
     if (errores[name]) setErrores(prev => ({ ...prev, [name]: undefined }))
   }
 
@@ -156,7 +156,6 @@ export default function PredictionForm({ onSubmit, loading }) {
       alco:        parseInt(campos.alco),
       active:      parseInt(campos.active),
     }
-    // Agregar opcionales si tienen valor
     if (campos.colesterol_total_mgdl !== '') payload.colesterol_total_mgdl = parseFloat(campos.colesterol_total_mgdl)
     if (campos.hdl_mgdl !== '') payload.hdl_mgdl = parseFloat(campos.hdl_mgdl)
     if (campos.diabetes !== '') payload.diabetes = parseInt(campos.diabetes)
@@ -174,7 +173,6 @@ export default function PredictionForm({ onSubmit, loading }) {
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="space-y-8">
-
         <div>
           <SectionTitle icono={User}>Datos personales</SectionTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -231,7 +229,6 @@ export default function PredictionForm({ onSubmit, loading }) {
           </div>
         </div>
 
-        {/* ─── Nueva sección: Framingham opcional ─── */}
         <div>
           <SectionTitle icono={FlaskConical}>Datos para Framingham (opcionales)</SectionTitle>
           <p className="text-xs text-slate-500 mb-4 -mt-3">
@@ -280,7 +277,6 @@ export default function PredictionForm({ onSubmit, loading }) {
             />
           </div>
         </div>
-
       </div>
 
       <div className="mt-10">

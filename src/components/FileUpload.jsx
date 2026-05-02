@@ -1,11 +1,11 @@
 import { useState, useRef } from 'react'
 import { Upload, FileText, X, AlertCircle, FileJson, File, CheckCircle, Sparkles } from 'lucide-react'
+import { usePredictionContext } from '../context/PredictionContext'
 
-export default function FileUpload({ onSubmit, loading, camposFaltantesExternos = [] }) {
-  const [archivos, setArchivos]               = useState([])
-  const [tipoArchivo, setTipoArchivo]         = useState(null)
+export default function FileUpload({ onSubmit, loading }) {
+  const { state, dispatch, ActionTypes } = usePredictionContext()
+  const { files, tipo, manualValues, missingFields } = state.upload
   const [errorTipo, setErrorTipo]             = useState(null)
-  const [valoresManuales, setValoresManuales] = useState({})
   const [isDragging, setIsDragging]           = useState(false)
   const inputRef = useRef(null)
 
@@ -21,16 +21,17 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
   const handleArchivos = (nuevos) => {
     setErrorTipo(null)
     const lista = Array.from(nuevos)
-    const tipo  = validarTipo(lista[0])
+    const tipoDetectado = validarTipo(lista[0])
 
-    if (!tipo) { setErrorTipo('Solo se aceptan archivos JSON o PDF.'); return }
-    if (lista.some(a => validarTipo(a) !== tipo)) { setErrorTipo('No se pueden mezclar archivos JSON y PDF.'); return }
-    if (tipo === 'json' && lista.length > 1) { setErrorTipo('Solo se puede subir un archivo JSON a la vez.'); return }
-    if (tipo === 'pdf'  && lista.length > 5) { setErrorTipo('Se permiten máximo 5 archivos PDF por solicitud.'); return }
+    if (!tipoDetectado) { setErrorTipo('Solo se aceptan archivos JSON o PDF.'); return }
+    if (lista.some(a => validarTipo(a) !== tipoDetectado)) { setErrorTipo('No se pueden mezclar archivos JSON y PDF.'); return }
+    if (tipoDetectado === 'json' && lista.length > 1) { setErrorTipo('Solo se puede subir un archivo JSON a la vez.'); return }
+    if (tipoDetectado === 'pdf'  && lista.length > 5) { setErrorTipo('Se permiten máximo 5 archivos PDF por solicitud.'); return }
 
-    setArchivos(lista)
-    setTipoArchivo(tipo)
-    setValoresManuales({})
+    dispatch({
+      type: ActionTypes.SET_UPLOAD_FILES,
+      payload: { files: lista, tipo: tipoDetectado }
+    })
   }
 
   const handleDrop     = (e) => { 
@@ -48,30 +49,31 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
   }
 
   const quitarArchivo = (index) => {
-    const nueva = archivos.filter((_, i) => i !== index)
-    setArchivos(nueva)
-    if (nueva.length === 0) { setTipoArchivo(null); setValoresManuales({}) }
+    const nueva = files.filter((_, i) => i !== index)
+    dispatch({
+      type: ActionTypes.SET_UPLOAD_FILES,
+      payload: { files: nueva, tipo: nueva.length > 0 ? tipo : null }
+    })
   }
 
   const handleCampoManual = (campo, valor) => {
-    setValoresManuales(prev => ({ ...prev, [campo]: valor }))
+    dispatch({ type: ActionTypes.SET_UPLOAD_MANUAL_VALUES, payload: { ...manualValues, [campo]: valor } })
   }
 
   const handleSubmit = () => {
-    if (!archivos.length) return
-    onSubmit(archivos, tipoArchivo, valoresManuales)
+    if (!files.length) return
+    onSubmit(files, tipo, manualValues)
   }
 
-  const todosCompletos = camposFaltantesExternos.length === 0 ||
-    camposFaltantesExternos.every(c =>
-      valoresManuales[c.campo] !== undefined && valoresManuales[c.campo] !== ''
+  const todosCompletos = (missingFields.length === 0) ||
+    missingFields.every(c =>
+      manualValues[c.campo] !== undefined && manualValues[c.campo] !== ''
     )
 
-  const FileIcon = tipoArchivo === 'json' ? FileJson : File
+  const FileIcon = tipo === 'json' ? FileJson : File
 
   return (
     <div className="space-y-6">
-
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -95,7 +97,6 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
           onChange={e => handleArchivos(e.target.files)}
         />
         
-        {/* Background effect */}
         <div className={`absolute inset-0 bg-gradient-to-br from-blue-500/5 to-red-500/5 opacity-0 hover:opacity-100 transition-opacity duration-500`} />
         
         <div className="relative">
@@ -125,26 +126,26 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
         </div>
       )}
 
-      {archivos.length > 0 && (
+      {files.length > 0 && (
         <div className="space-y-3 animate-scale-in">
           <p className="text-xs text-slate-500 uppercase tracking-widest font-medium">
-            {archivos.length} archivo{archivos.length > 1 ? 's' : ''} seleccionado{archivos.length > 1 ? 's' : ''}
+            {files.length} archivo{files.length > 1 ? 's' : ''} seleccionado{files.length > 1 ? 's' : ''}
           </p>
-          {archivos.map((archivo, i) => (
+          {files.map((archivo, i) => (
             <div key={i} className="flex items-center justify-between p-4 glass-card rounded-xl">
               <div className="flex items-center gap-4">
                 <div className={`p-3 rounded-xl ${
-                  tipoArchivo === 'json' ? 'bg-blue-500/10' : 'bg-red-500/10'
+                  tipo === 'json' ? 'bg-blue-500/10' : 'bg-red-500/10'
                 }`}>
                   <FileIcon 
-                    className={tipoArchivo === 'json' ? 'text-blue-400' : 'text-red-400'} 
+                    className={tipo === 'json' ? 'text-blue-400' : 'text-red-400'} 
                     size={24} 
                   />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-slate-200">{archivo.name}</p>
                   <p className="text-xs text-slate-500">
-                    {(archivo.size / 1024).toFixed(1)} KB · {tipoArchivo?.toUpperCase()}
+                    {(archivo.size / 1024).toFixed(1)} KB · {tipo?.toUpperCase()}
                   </p>
                 </div>
               </div>
@@ -159,7 +160,7 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
         </div>
       )}
 
-      {camposFaltantesExternos.length > 0 && (
+      {missingFields.length > 0 && (
         <div className="glass-card border border-yellow-500/20 rounded-2xl p-6 animate-scale-in">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 rounded-lg bg-yellow-500/10">
@@ -167,7 +168,7 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
             </div>
             <div>
               <p className="text-sm font-semibold text-slate-200">
-                {camposFaltantesExternos.length} campo{camposFaltantesExternos.length > 1 ? 's' : ''} no encontrado{camposFaltantesExternos.length > 1 ? 's' : ''} en el archivo
+                {missingFields.length} campo{missingFields.length > 1 ? 's' : ''} no encontrado{missingFields.length > 1 ? 's' : ''} en el archivo
               </p>
               <p className="text-xs text-slate-500">
                 Complete los valores faltantes para continuar con la predicción.
@@ -175,14 +176,14 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {camposFaltantesExternos.map(({ campo, descripcion }) => (
+            {missingFields.map(({ campo, descripcion }) => (
               <div key={campo}>
                 <label className="block text-xs font-medium text-slate-400 mb-1.5">
                   {descripcion}
                 </label>
                 <input
                   type="number"
-                  value={valoresManuales[campo] ?? ''}
+                  value={manualValues[campo] ?? ''}
                   onChange={e => handleCampoManual(campo, e.target.value)}
                   className="w-full px-4 py-3 rounded-xl input-glass text-sm"
                   placeholder={`Ingrese ${descripcion.toLowerCase()}`}
@@ -193,7 +194,7 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
         </div>
       )}
 
-      {archivos.length > 0 && (
+      {files.length > 0 && (
         <button
           onClick={handleSubmit}
           disabled={loading || !todosCompletos}
@@ -212,7 +213,6 @@ export default function FileUpload({ onSubmit, loading, camposFaltantesExternos 
           )}
         </button>
       )}
-
     </div>
   )
 }

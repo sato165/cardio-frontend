@@ -1,26 +1,14 @@
-import { Heart, HeartPulse, Shield, FileText, Users, Brain, BarChart2, AlertTriangle, CheckCircle, Cpu, Activity, Database } from 'lucide-react'
+import {
+  HeartPulse, Activity, Shield, FileText, Brain, BarChart2,
+  AlertTriangle, CheckCircle, Cpu, Database, Users,
+  Layers, Code2, Network, Server, Monitor, ArrowRight
+} from 'lucide-react'
 
 function SectionTitle({ children }) {
   return (
     <h2 className="text-lg font-bold text-white mb-6 pb-3 border-b border-white/10 flex items-center gap-2">
       {children}
     </h2>
-  )
-}
-
-function MetricCard({ valor, label, sub, color = 'blue' }) {
-  const colorClasses = {
-    blue: 'from-blue-500/20 to-blue-600/5 border-blue-500/20',
-    red: 'from-red-500/20 to-red-600/5 border-red-500/20',
-    cyan: 'from-cyan-500/20 to-cyan-600/5 border-cyan-500/20',
-    green: 'from-green-500/20 to-green-600/5 border-green-500/20',
-  }
-  return (
-    <div className={`bg-gradient-to-br ${colorClasses[color]} border rounded-2xl p-5 text-center`}>
-      <p className="text-3xl font-bold text-white mb-1">{valor}</p>
-      <p className="text-sm font-medium text-slate-300">{label}</p>
-      {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
-    </div>
   )
 }
 
@@ -34,62 +22,6 @@ function FeatureRow({ icono, titulo, descripcion }) {
       <div>
         <p className="text-sm font-semibold text-slate-200 mb-1">{titulo}</p>
         <p className="text-xs text-slate-500 leading-relaxed">{descripcion}</p>
-      </div>
-    </div>
-  )
-}
-
-function ModelRow({ modelo, accuracy, f1, auc, activo }) {
-  return (
-    <tr className={activo ? 'bg-blue-500/10' : ''}>
-      <td className="px-4 py-3 text-sm font-medium text-slate-200 flex items-center gap-2">
-        {modelo}
-        {activo && (
-          <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium">
-            Activo
-          </span>
-        )}
-      </td>
-      <td className="px-4 py-3 text-sm text-slate-400 text-center">{accuracy}</td>
-      <td className="px-4 py-3 text-sm text-slate-400 text-center">{f1}</td>
-      <td className="px-4 py-3 text-sm font-semibold text-blue-400 text-center">{auc}</td>
-    </tr>
-  )
-}
-
-function VariableRow({ variable, tipo, descripcion, sesgo }) {
-  return (
-    <tr className="border-b border-white/5 last:border-0">
-      <td className="px-4 py-3">
-        <code className="text-xs bg-slate-800 text-blue-400 px-2 py-1 rounded font-mono">
-          {variable}
-        </code>
-      </td>
-      <td className="px-4 py-3 text-xs text-slate-500">{tipo}</td>
-      <td className="px-4 py-3 text-sm text-slate-400">{descripcion}</td>
-      <td className="px-4 py-3">
-        {sesgo && (
-          <span className="flex items-center gap-1 text-xs text-yellow-400">
-            <AlertTriangle size={11} />
-            Subregistro
-          </span>
-        )}
-      </td>
-    </tr>
-  )
-}
-
-function TeamCard({ nombre, rol, area }) {
-  const iniciales = nombre.split(' ').slice(0, 2).map(n => n[0]).join('')
-  return (
-    <div className="glass-card border border-white/5 rounded-2xl p-5 flex items-center gap-4">
-      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-red-500 flex items-center justify-center shrink-0">
-        <span className="text-white font-bold text-sm">{iniciales}</span>
-      </div>
-      <div>
-        <p className="text-sm font-semibold text-slate-200">{nombre}</p>
-        <p className="text-xs text-blue-400 font-medium">{rol}</p>
-        <p className="text-xs text-slate-500 mt-0.5">{area}</p>
       </div>
     </div>
   )
@@ -109,178 +41,182 @@ function StackBadge({ nombre, version, categoria }) {
   )
 }
 
+function MetricCard({ valor, label, color = 'blue' }) {
+  const colorClasses = {
+    blue: 'from-blue-500/20 to-blue-600/5 border-blue-500/20',
+    red: 'from-red-500/20 to-red-600/5 border-red-500/20',
+    cyan: 'from-cyan-500/20 to-cyan-600/5 border-cyan-500/20',
+    green: 'from-green-500/20 to-green-600/5 border-green-500/20',
+  }
+  return (
+    <div className={`bg-gradient-to-br ${colorClasses[color]} border rounded-2xl p-5 text-center`}>
+      <p className="text-3xl font-bold text-white mb-1">{valor}</p>
+      <p className="text-sm font-medium text-slate-300">{label}</p>
+    </div>
+  )
+}
+
+function TeamCard({ nombre, rol, area }) {
+  const iniciales = nombre.split(' ').slice(0, 2).map(n => n[0]).join('')
+  return (
+    <div className="glass-card border border-white/5 rounded-2xl p-5 flex items-center gap-4">
+      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-red-500 flex items-center justify-center shrink-0">
+        <span className="text-white font-bold text-sm">{iniciales}</span>
+      </div>
+      <div>
+        <p className="text-sm font-semibold text-slate-200">{nombre}</p>
+        <p className="text-xs text-blue-400 font-medium">{rol}</p>
+        <p className="text-xs text-slate-500 mt-0.5">{area}</p>
+      </div>
+    </div>
+  )
+}
+
 export default function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-12 pb-16">
 
+      {/* Encabezado */}
       <div className="text-center pt-4 animate-slide-up">
         <div className="relative inline-block mb-6">
           <div className="absolute inset-0 bg-red-500/20 rounded-full blur-2xl" />
-        <div className="relative p-5 rounded-3xl glass-card">
-          <HeartPulse className="text-red-500 animate-heartbeat heart-glow" size={40} fill="currentColor" strokeWidth={2} />
-        </div>
+          <div className="relative p-5 rounded-3xl glass-card">
+            <HeartPulse className="text-red-500 animate-heartbeat heart-glow" size={40} fill="currentColor" strokeWidth={2} />
+          </div>
         </div>
         <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">
           Artery<span className="text-gradient-red">-VA</span>
         </h1>
         <p className="text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
-          Sistema de predicción de riesgo cardiovascular con explicabilidad clínica
-          para médicos. Proyecto integrador de Ingeniería de Sistemas e Ingeniería Biomédica.
+          Sistema de predicción de riesgo cardiovascular con explicabilidad clínica para médicos.
+          Proyecto integrador de Ingeniería de Sistemas e Ingeniería Biomédica.
         </p>
         <p className="text-xs text-slate-500 mt-4">
           Universidad · 2026
         </p>
       </div>
 
+      {/* Arquitectura general */}
       <section className="animate-slide-up delay-100">
-        <SectionTitle><Activity size={20} className="text-blue-400" /> Rendimiento del modelo</SectionTitle>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <MetricCard valor="0.799" label="AUC-ROC" sub="XGBoost tuneado" color="blue" />
-          <MetricCard valor="73.3%" label="Accuracy" sub="En conjunto de test" color="cyan" />
-          <MetricCard valor="71.9%" label="F1-Score" sub="Media ponderada" color="green" />
-          <MetricCard valor="68 515" label="Registros" sub="Tras limpieza" color="red" />
-        </div>
-      </section>
-
-      <section className="animate-slide-up delay-200">
-        <SectionTitle><Cpu size={20} className="text-blue-400" /> Comparativa de modelos entrenados</SectionTitle>
-        <p className="text-sm text-slate-400 mb-5 leading-relaxed">
-          Se entrenaron y compararon dos modelos con ajuste de hiperparámetros mediante
-          GridSearchCV con validación cruzada estratificada de 5 folds. El criterio de
-          selección principal fue AUC-ROC por ser más informativo que accuracy en
-          clasificación binaria médica.
-        </p>
-        <div className="glass-card border border-white/5 rounded-2xl overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-800/80">
-              <tr>
-                <th className="px-4 py-3 text-sm font-semibold text-slate-300 text-left">Modelo</th>
-                <th className="px-4 py-3 text-sm font-semibold text-slate-300 text-center">Accuracy</th>
-                <th className="px-4 py-3 text-sm font-semibold text-slate-300 text-center">F1</th>
-                <th className="px-4 py-3 text-sm font-semibold text-slate-300 text-center">AUC-ROC</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              <ModelRow modelo="Random Forest (baseline)" accuracy="71.1%" f1="70.3%" auc="76.6%" activo={false} />
-              <ModelRow modelo="Random Forest (tuneado)"  accuracy="73.1%" f1="71.5%" auc="79.8%" activo={false} />
-              <ModelRow modelo="XGBoost (baseline)"       accuracy="72.9%" f1="71.5%" auc="79.3%" activo={false} />
-              <ModelRow modelo="XGBoost (tuneado)"        accuracy="73.3%" f1="71.9%" auc="79.9%" activo={true}  />
-            </tbody>
-          </table>
-        </div>
-        <p className="text-xs text-slate-500 mt-3">
-          Hiperparámetros XGBoost seleccionados: max_depth=4 · learning_rate=0.05 ·
-          n_estimators=200 · subsample=0.8 · colsample_bytree=0.8
-        </p>
-      </section>
-
-      <section className="animate-slide-up delay-300">
-        <SectionTitle><Database size={20} className="text-blue-400" /> Dataset</SectionTitle>
-        <p className="text-sm text-slate-400 mb-5 leading-relaxed">
-          Dataset público de enfermedades cardiovasculares disponible en Kaggle.
-          Contiene 70 000 registros originales recopilados en el momento del examen médico.
-          Tras el proceso de limpieza quedaron 68 515 registros con balance de clases 50/50,
-          lo que elimina la necesidad de técnicas de sobremuestreo.
-        </p>
-        <div className="glass-card border border-white/5 rounded-2xl overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-800/50">
-              <tr>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left uppercase tracking-wider">Variable</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left uppercase tracking-wider">Tipo</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left uppercase tracking-wider">Descripción</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-left uppercase tracking-wider">Nota</th>
-              </tr>
-            </thead>
-            <tbody>
-              <VariableRow variable="age"         tipo="Numérica"  descripcion="Edad en años (convertida desde días)"             sesgo={false} />
-              <VariableRow variable="gender"      tipo="Categórica" descripcion="1 = mujer · 2 = hombre"                         sesgo={false} />
-              <VariableRow variable="height"      tipo="Numérica"  descripcion="Altura en cm · rango válido: 140–220"             sesgo={false} />
-              <VariableRow variable="weight"      tipo="Numérica"  descripcion="Peso en kg · rango válido: 30–180"               sesgo={false} />
-              <VariableRow variable="ap_hi"       tipo="Numérica"  descripcion="Presión sistólica mmHg · rango: 60–250"          sesgo={false} />
-              <VariableRow variable="ap_lo"       tipo="Numérica"  descripcion="Presión diastólica mmHg · rango: 40–200"         sesgo={false} />
-              <VariableRow variable="cholesterol" tipo="Ordinal"   descripcion="1 normal · 2 alto · 3 muy alto"                  sesgo={false} />
-              <VariableRow variable="gluc"        tipo="Ordinal"   descripcion="1 normal · 2 alto · 3 muy alto"                  sesgo={false} />
-              <VariableRow variable="smoke"       tipo="Binaria"   descripcion="0 no fuma · 1 fuma (8.8% positivos)"            sesgo={true}  />
-              <VariableRow variable="alco"        tipo="Binaria"   descripcion="0 no consume · 1 consume alcohol (5.4%)"        sesgo={true}  />
-              <VariableRow variable="active"      tipo="Binaria"   descripcion="0 sedentario · 1 activo físicamente"            sesgo={false} />
-              <VariableRow variable="cardio"      tipo="Objetivo"  descripcion="0 sin enfermedad · 1 con enfermedad (50/50)"    sesgo={false} />
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl flex gap-3">
-          <AlertTriangle className="text-yellow-400 shrink-0 mt-0.5" size={16} />
-          <div>
-            <p className="text-sm font-semibold text-yellow-300 mb-1">
-              Sesgo de subregistro en tabaquismo y alcohol
-            </p>
-            <p className="text-xs text-yellow-400/70 leading-relaxed">
-              Las variables <code className="bg-yellow-500/20 px-1 rounded text-yellow-300">smoke</code> y{' '}
-              <code className="bg-yellow-500/20 px-1 rounded text-yellow-300">alco</code> son autorreportadas
-              por el paciente. El análisis exploratorio muestra que los fumadores tienen una
-              tasa de cardio paradójicamente menor que los no fumadores (47.5% vs 50.2%),
-              lo cual contradice la evidencia médica y confirma subregistro sistemático con
-              sesgo de género diferencial. El modelo refleja esta limitación del dataset y
-              advierte al médico en la explicabilidad de cada predicción.
-            </p>
+        <SectionTitle><Layers size={20} className="text-blue-400" /> Arquitectura del sistema</SectionTitle>
+        <div className="glass-card border border-white/5 rounded-2xl p-6">
+          <p className="text-sm text-slate-300 mb-4">
+            Artery-VA sigue una arquitectura <strong>cliente‑servidor</strong> con separación clara de responsabilidades.
+            El frontend, construido con React y Vite, consume una API REST desarrollada en FastAPI.
+            Los modelos de machine learning se ejecutan en el backend sin intervención del navegador.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <div className="bg-slate-800/50 rounded-xl p-4">
+              <p className="text-xs font-semibold text-red-300 uppercase mb-2">Frontend</p>
+              <p className="text-sm text-slate-400">
+                React 19 · Vite 6 · Tailwind CSS 4 · React Router 7 · Axios · Recharts
+              </p>
+            </div>
+            <div className="bg-slate-800/50 rounded-xl p-4">
+              <p className="text-xs font-semibold text-blue-300 uppercase mb-2">Backend</p>
+              <p className="text-sm text-slate-400">
+                FastAPI · XGBoost · SHAP · LIME · PyMuPDF · pdfplumber · Pydantic v2
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="animate-slide-up delay-400">
-        <SectionTitle><BarChart2 size={20} className="text-blue-400" /> Feature engineering</SectionTitle>
-        <p className="text-sm text-slate-400 mb-5 leading-relaxed">
-          Además de las 11 variables originales, se construyeron 4 features derivados con
-          justificación clínica que enriquecen la señal del modelo.
-        </p>
+      {/* Flujo de una predicción */}
+      <section className="animate-slide-up delay-200">
+        <SectionTitle><Activity size={20} className="text-blue-400" /> Flujo de datos</SectionTitle>
         <div className="glass-card border border-white/5 rounded-2xl divide-y divide-white/5">
           <FeatureRow
-            icono={BarChart2}
-            titulo="IMC — Índice de Masa Corporal"
-            descripcion="Calculado como peso(kg) / altura(m)². Combina peso y altura en una métrica clínica estándar con interpretación directa según clasificación OMS."
+            icono={Monitor}
+            titulo="1. El médico ingresa datos manuales o sube una historia clínica (JSON / PDF)"
+            descripcion="El frontend envía los datos al endpoint /api/predict o /api/predict/upload según corresponda."
           />
           <FeatureRow
-            icono={Heart}
-            titulo="Categoría de presión arterial (bp_category)"
-            descripcion="Clasificación AHA en 4 niveles: Normal, Elevada, HTA grado 1, HTA grado 2. El feature con gradiente más limpio: de 22.1% de riesgo en presión normal a 84.3% en HTA grado 2."
-          />
-          <FeatureRow
-            icono={Shield}
-            titulo="Pulso de presión (pulse_pressure)"
-            descripcion="Diferencia entre presión sistólica y diastólica. Indicador de rigidez arterial con correlación 0.337 con cardio — la tercera más alta del dataset."
+            icono={Server}
+            titulo="2. FastAPI valida los datos con Pydantic y los pasa al servicio de predicción"
+            descripcion="El servicio preprocesa los datos, aplica feature engineering y ejecuta el modelo XGBoost."
           />
           <FeatureRow
             icono={Brain}
-            titulo="Score de riesgo metabólico (metabolic_risk)"
-            descripcion="Score sentado de 0 a 3 combinando colesterol elevado, glucosa elevada y obesidad (IMC ≥ 30). Sube de 39.6% de riesgo con score 0 a 72.7% con score 3."
+            titulo="3. El modelo retorna riesgo, probabilidad y explicabilidad"
+            descripcion="Se calculan valores SHAP y se generan explicaciones en texto legible para el médico."
+          />
+          <FeatureRow
+            icono={Monitor}
+            titulo="4. El frontend muestra el resultado y los gráficos de explicabilidad"
+            descripcion="ResultCard y ExplainabilityChart presentan la información de forma clara e interpretable."
           />
         </div>
       </section>
 
-      <section className="animate-slide-up delay-500">
+      {/* Endpoints */}
+      <section className="animate-slide-up delay-300">
+        <SectionTitle><Network size={20} className="text-blue-400" /> Endpoints de la API</SectionTitle>
+        <div className="glass-card border border-white/5 rounded-2xl overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-800/80">
+              <tr>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-300 text-left uppercase">Método</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-300 text-left uppercase">Ruta</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-300 text-left uppercase">Descripción</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              <tr>
+                <td className="px-4 py-3 text-blue-400 font-mono text-xs">POST</td>
+                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/predict</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Predicción a partir de formulario manual (11 campos).</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-blue-400 font-mono text-xs">POST</td>
+                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/predict/upload</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Predicción a partir de un archivo JSON de historia clínica.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-blue-400 font-mono text-xs">POST</td>
+                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/predict/upload/pdf</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Predicción a partir de uno o varios PDFs de historia clínica.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-blue-400 font-mono text-xs">GET</td>
+                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/health</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Verificación de que el servidor y el modelo están operativos.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-blue-400 font-mono text-xs">GET</td>
+                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/docs</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Swagger UI autogenerado con toda la documentación de la API.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Explicabilidad */}
+      <section className="animate-slide-up delay-400">
         <SectionTitle><Brain size={20} className="text-blue-400" /> Explicabilidad clínica</SectionTitle>
         <div className="glass-card border border-white/5 rounded-2xl divide-y divide-white/5">
           <FeatureRow
             icono={Brain}
             titulo="SHAP (SHapley Additive exPlanations)"
-            descripcion="Calcula la contribución de cada variable a la predicción individual. Los valores positivos aumentan el riesgo y los negativos lo reducen. Se presenta ordenado por impacto absoluto con descripción en lenguaje clínico para cada factor."
+            descripcion="Calcula la contribución de cada variable a la predicción individual. Los valores positivos aumentan el riesgo y los negativos lo reducen."
           />
           <FeatureRow
             icono={FileText}
             titulo="LIME (Local Interpretable Model-agnostic Explanations)"
-            descripcion="Alternativa a SHAP que explica predicciones individuales perturbando los datos de entrada localmente. Implementado como complemento para validación cruzada de la explicabilidad."
+            descripcion="Alternativa a SHAP que explica predicciones individuales perturbando los datos de entrada localmente."
           />
           <FeatureRow
-            icono={CheckCircle}
-            titulo="Texto clínico legible"
-            descripcion="Cada factor se presenta en lenguaje natural para el médico: 'Su presión sistólica de 145 mmHg aumenta el riesgo en un 18%'. Las variables con sesgo documentado incluyen una advertencia explícita."
+            icono={AlertTriangle}
+            titulo="Advertencias de subregistro"
+            descripcion="Las variables autorreportadas (tabaquismo y alcohol) incluyen una nota explícita sobre posible sesgo de subregistro."
           />
         </div>
       </section>
 
+      {/* Stack tecnológico */}
       <section className="animate-slide-up delay-500">
-        <SectionTitle><Cpu size={20} className="text-blue-400" /> Stack tecnológico</SectionTitle>
+        <SectionTitle><Code2 size={20} className="text-blue-400" /> Stack tecnológico</SectionTitle>
         <div className="space-y-6">
           <div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Backend</p>
@@ -319,71 +255,17 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Pruebas */}
       <section className="animate-slide-up delay-500">
         <SectionTitle><CheckCircle size={20} className="text-blue-400" /> Pruebas del sistema</SectionTitle>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="glass-card border border-white/5 rounded-2xl p-5 text-center">
-            <p className="text-3xl font-bold text-white mb-1">66</p>
-            <p className="text-sm font-medium text-slate-300">Pruebas unitarias</p>
-            <p className="text-xs text-slate-500 mt-1">pytest · 100% passing</p>
-          </div>
-          <div className="glass-card border border-white/5 rounded-2xl p-5 text-center">
-            <p className="text-3xl font-bold text-white mb-1">3</p>
-            <p className="text-sm font-medium text-slate-300">Archivos de test</p>
-            <p className="text-xs text-slate-500 mt-1">predict · upload · preprocessing</p>
-          </div>
-          <div className="glass-card border border-white/5 rounded-2xl p-5 text-center">
-            <p className="text-3xl font-bold text-white mb-1">3</p>
-            <p className="text-sm font-medium text-slate-300">Endpoints probados</p>
-            <p className="text-xs text-slate-500 mt-1">manual · JSON · PDF</p>
-          </div>
+          <MetricCard valor="66" label="Pruebas unitarias" color="blue" />
+          <MetricCard valor="3" label="Archivos de test" color="cyan" />
+          <MetricCard valor="3" label="Endpoints probados" color="green" />
         </div>
       </section>
 
-      <section className="animate-slide-up delay-500">
-        <SectionTitle><Activity size={20} className="text-blue-400" /> Modelos de riesgo comparados</SectionTitle>
-        <div className="glass-card border border-white/5 rounded-2xl p-6 space-y-5">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-blue-500/10 rounded-xl shrink-0">
-              <Cpu size={20} className="text-blue-400" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-slate-200">CardioPredict (Modelo propio)</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                XGBoost entrenado con 68k registros y 16 features (incluyendo ingeniería clínica). 
-                AUC-ROC 0.799. Usa variables categóricas ordinales para colesterol y glucosa (1/2/3).
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-red-500/10 rounded-xl shrink-0">
-              <Heart size={20} className="text-red-400" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-slate-200">Framingham 2008 (D'Agostino)</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Ecuación de riesgo general a 10 años desarrollada en cohorte de Framingham, Massachusetts. 
-                Utiliza edad, colesterol total, HDL, presión sistólica, tabaquismo, diabetes y tratamiento antihipertensivo. 
-                Validada internacionalmente pero tiende a sobreestimar el riesgo en poblaciones latinoamericanas.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-yellow-500/10 rounded-xl shrink-0">
-              <Shield size={20} className="text-yellow-400" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-slate-200">Sociedad Colombiana de Cardiología (SCC)</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Ajuste del puntaje de Framingham por un factor de 0.75 para corregir la sobreestimación en población colombiana, 
-                según validación de Muñoz et al. (Rev Col Cardiol 2014) y la Guía de dislipidemias del Ministerio de Salud. 
-                Se aplica el mismo umbral: Bajo &lt;10%, Moderado 10-20%, Alto &gt;20%.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      {/* Equipo */}
       <section className="animate-slide-up delay-500">
         <SectionTitle><Users size={20} className="text-blue-400" /> Equipo de desarrollo</SectionTitle>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
