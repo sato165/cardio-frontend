@@ -12,11 +12,12 @@ export default function ManualPage() {
   const { loading, result, error, patientData } = state.manual
 
   const handleSubmit = async (datos) => {
+    // Guardar los datos enviados para mostrarlos en el resumen
     dispatch({ type: ActionTypes.SET_MANUAL_PATIENT, payload: datos })
     dispatch({ type: ActionTypes.SET_MANUAL_LOADING, payload: true })
     dispatch({ type: ActionTypes.SET_MANUAL_ERROR, payload: null })
     try {
-      const res = await predecirManual(datos)
+      const res = await predecirManual(datos)     // res es PredictionOutput (backend nuevo)
       dispatch({ type: ActionTypes.SET_MANUAL_RESULT, payload: res })
     } catch (err) {
       const msg = err.response?.data?.detalle?.[0]?.mensaje ??
@@ -68,18 +69,21 @@ export default function ManualPage() {
               Nueva predicción
             </button>
           </div>
+          {/* PatientSummary mostrará los datos ingresados (formato de 22 campos) */}
           <PatientSummary paciente={patientData} />
+
+          {/* ResultCard muestra el perfil clínico asignado y las probabilidades */}
           <ResultCard resultado={result} />
 
+          {/* ComparisonCard para Framingham/SCC (si existen datos) */}
           {result.riesgo_comparativo && (
             <ComparisonCard
               riesgoComparativo={result.riesgo_comparativo}
-              probabilidadPropia={result.probabilidad}
-              nivelPropio={result.nivel_riesgo}
             />
           )}
 
-          <ExplainabilityChart explicabilidad={result.explicabilidad} />
+          {/* ExplainabilityChart ahora muestra las probabilidades por cluster */}
+          <ExplainabilityChart probabilidades={result.probabilities} />
         </div>
       )}
     </div>

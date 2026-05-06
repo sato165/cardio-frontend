@@ -2,6 +2,32 @@ import { useState, useRef } from 'react'
 import { Upload, FileText, X, AlertCircle, FileJson, File, CheckCircle, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
 import { usePredictionContext } from '../context/PredictionContext'
 
+// 22 campos obligatorios para mostrar al usuario si faltan
+const ETIQUETAS_OBLIGATORIOS = {
+  creatinina: 'Creatinina (mg/dL)',
+  celulas_medias: 'Células medias VCM (fL)',
+  glucosa: 'Glucosa (mg/dL)',
+  granulocitos: 'Granulocitos (%)',
+  hdl: 'HDL (mg/dL)',
+  hematocrito: 'Hematocrito (%)',
+  hemoglobina: 'Hemoglobina (g/dL)',
+  ldl: 'LDL (mg/dL)',
+  leucocitos: 'Leucocitos (10³/µL)',
+  linfocitos: 'Linfocitos (%)',
+  plaquetas: 'Plaquetas (10³/µL)',
+  trigliceridos: 'Triglicéridos (mg/dL)',
+  edad: 'Edad (años)',
+  sexo: 'Sexo (0=Mujer, 1=Hombre)',
+  zona: 'Zona (0=Rural, 1=Urbana)',
+  ap_hipertension: 'Antecedente HTA (0/1)',
+  ta_sistolica: 'Presión sistólica (mmHg)',
+  ta_diastolica: 'Presión diastólica (mmHg)',
+  peso: 'Peso (kg)',
+  talla: 'Talla (m)',
+  imc: 'IMC (kg/m²)',
+  TFG: 'TFG (mL/min/1.73m²)',
+}
+
 export default function FileUpload({ onSubmit, loading }) {
   const { state, dispatch, ActionTypes } = usePredictionContext()
   const { files, tipo, manualValues, missingFields, framinghamMissing, framinghamValues } = state.upload
@@ -35,19 +61,9 @@ export default function FileUpload({ onSubmit, loading }) {
     })
   }
 
-  const handleDrop     = (e) => { 
-    e.preventDefault()
-    setIsDragging(false)
-    handleArchivos(e.dataTransfer.files) 
-  }
-  const handleDragOver = (e) => { 
-    e.preventDefault()
-    setIsDragging(true)
-  }
-  const handleDragLeave = (e) => {
-    e.preventDefault()
-    setIsDragging(false)
-  }
+  const handleDrop     = (e) => { e.preventDefault(); setIsDragging(false); handleArchivos(e.dataTransfer.files) }
+  const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true) }
+  const handleDragLeave = (e) => { e.preventDefault(); setIsDragging(false) }
 
   const quitarArchivo = (index) => {
     const nueva = files.filter((_, i) => i !== index)
@@ -67,21 +83,18 @@ export default function FileUpload({ onSubmit, loading }) {
 
   const handleSubmit = () => {
     if (!files.length) return
-    // Combinar valores obligatorios (si los hubiera) con los opcionales de Framingham
     const payloadManual = { ...manualValues, ...framinghamValues }
-    // Eliminar claves con valor vacío
     const finalManual = Object.fromEntries(
       Object.entries(payloadManual).filter(([_, v]) => v !== '' && v !== undefined)
     )
     onSubmit(files, tipo, finalManual)
   }
 
-  const todosCompletos = (missingFields.length === 0) ||
+  // Verificar si se completaron todos los obligatorios principales
+  const todosCompletos = missingFields.length === 0 ||
     missingFields.every(c =>
       manualValues[c.campo] !== undefined && manualValues[c.campo] !== ''
     )
-
-  const tieneOpcionalesFramingham = framinghamMissing && framinghamMissing.length > 0
 
   const FileIcon = tipo === 'json' ? FileJson : File
 
@@ -110,8 +123,6 @@ export default function FileUpload({ onSubmit, loading }) {
           onChange={e => handleArchivos(e.target.files)}
         />
         
-        <div className={`absolute inset-0 bg-gradient-to-br from-blue-500/5 to-red-500/5 opacity-0 hover:opacity-100 transition-opacity duration-500`} />
-        
         <div className="relative">
           <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 transition-all duration-300 ${
             isDragging ? 'bg-blue-500/20 scale-110' : 'bg-slate-700/50'
@@ -120,15 +131,11 @@ export default function FileUpload({ onSubmit, loading }) {
           </div>
           
           <p className="text-slate-200 font-medium mb-2">
-            {isDragging ? 'Suelta los archivos aquí' : 'Arrastra los archivos aquí o haz clic para seleccionar'}
+            {isDragging ? 'Suelta los archivos aquí' : 'Arrastra archivos aquí o haz clic para seleccionar'}
           </p>
           <p className="text-xs text-slate-500">
             JSON (1 archivo) · PDF (hasta 5 del mismo paciente)
           </p>
-          
-          {isDragging && (
-            <div className="absolute inset-0 border-2 border-blue-500/50 rounded-2xl animate-pulse pointer-events-none" />
-          )}
         </div>
       </div>
 
@@ -147,13 +154,8 @@ export default function FileUpload({ onSubmit, loading }) {
           {files.map((archivo, i) => (
             <div key={i} className="flex items-center justify-between p-4 glass-card rounded-xl">
               <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${
-                  tipo === 'json' ? 'bg-blue-500/10' : 'bg-red-500/10'
-                }`}>
-                  <FileIcon 
-                    className={tipo === 'json' ? 'text-blue-400' : 'text-red-400'} 
-                    size={24} 
-                  />
+                <div className={`p-3 rounded-xl ${tipo === 'json' ? 'bg-blue-500/10' : 'bg-red-500/10'}`}>
+                  <FileIcon className={tipo === 'json' ? 'text-blue-400' : 'text-red-400'} size={24} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-slate-200">{archivo.name}</p>
@@ -173,6 +175,7 @@ export default function FileUpload({ onSubmit, loading }) {
         </div>
       )}
 
+      {/* Campos obligatorios faltantes (22 variables) */}
       {missingFields.length > 0 && (
         <div className="glass-card border border-yellow-500/20 rounded-2xl p-6 animate-scale-in">
           <div className="flex items-center gap-3 mb-4">
@@ -192,14 +195,14 @@ export default function FileUpload({ onSubmit, loading }) {
             {missingFields.map(({ campo, descripcion }) => (
               <div key={campo}>
                 <label className="block text-xs font-medium text-slate-400 mb-1.5">
-                  {descripcion}
+                  {descripcion || ETIQUETAS_OBLIGATORIOS[campo] || campo}
                 </label>
                 <input
                   type="number"
                   value={manualValues[campo] ?? ''}
                   onChange={e => handleCampoManual(campo, e.target.value)}
                   className="w-full px-4 py-3 rounded-xl input-glass text-sm"
-                  placeholder={`Ingrese ${descripcion.toLowerCase()}`}
+                  placeholder={`Ingrese el valor`}
                 />
               </div>
             ))}
@@ -207,8 +210,8 @@ export default function FileUpload({ onSubmit, loading }) {
         </div>
       )}
 
-      {/* Sección opcional para datos de Framingham */}
-      {!missingFields.length && tieneOpcionalesFramingham && (
+      {/* Opcionales Framingham */}
+      {!missingFields.length && framinghamMissing && framinghamMissing.length > 0 && (
         <div className="glass-card border border-blue-500/20 rounded-2xl p-6 animate-scale-in">
           <div 
             className="flex items-center justify-between cursor-pointer" 
@@ -223,7 +226,7 @@ export default function FileUpload({ onSubmit, loading }) {
                   Datos para comparación con Framingham y SCC (opcional)
                 </p>
                 <p className="text-xs text-slate-500">
-                  Faltan {framinghamMissing.length} dato(s) para habilitar la comparación con modelos clínicos.
+                  Faltan {framinghamMissing.length} dato(s) para habilitar la comparación.
                 </p>
               </div>
             </div>
@@ -236,7 +239,7 @@ export default function FileUpload({ onSubmit, loading }) {
                   <label className="block text-xs font-medium text-slate-400 mb-1.5">
                     {descripcion}
                   </label>
-                  {campo === 'diabetes' || campo === 'tratamiento_antihipertensivo' || campo === 'tratamiento_hta' ? (
+                  {campo === 'diabetes' || campo === 'tratamiento_antihipertensivo' || campo === 'fuma' ? (
                     <select
                       value={framinghamValues[campo] ?? ''}
                       onChange={(e) => handleFraminghamChange(campo, e.target.value)}

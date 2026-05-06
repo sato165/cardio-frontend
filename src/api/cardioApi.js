@@ -1,4 +1,4 @@
-// cardioApi.js 
+// cardioApi.js
 
 import axios from 'axios'
 
@@ -16,15 +16,14 @@ export async function predecirDesdeJson(archivo, camposManuales = {}) {
   const formData = new FormData()
   formData.append('archivo', archivo)
 
-  // Agregar todos los campos manuales (incluidos los de Framingham) como query params
   const params = new URLSearchParams()
   Object.entries(camposManuales).forEach(([k, v]) => {
     if (v !== '' && v !== undefined) params.append(k, v)
   })
 
   const url = params.toString()
-    ? `/api/predict/upload?${params.toString()}`
-    : '/api/predict/upload'
+    ? `/api/upload?${params.toString()}`
+    : '/api/upload'
 
   const { data } = await api.post(url, formData)
   return data
@@ -40,8 +39,8 @@ export async function predecirDesdePdf(archivos, camposManuales = {}) {
   })
 
   const url = params.toString()
-    ? `/api/predict/upload/pdf?${params.toString()}`
-    : '/api/predict/upload/pdf'
+    ? `/api/upload/pdf?${params.toString()}`
+    : '/api/upload/pdf'
 
   const { data } = await api.post(url, formData)
   return data

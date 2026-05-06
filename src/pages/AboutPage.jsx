@@ -1,7 +1,7 @@
 import {
-  HeartPulse, Activity, Shield, FileText, Brain, BarChart2,
+  HeartPulse, Activity, Shield, Brain, BarChart2,
   AlertTriangle, CheckCircle, Cpu, Database, Users,
-  Layers, Code2, Network, Server, Monitor, ArrowRight
+  Layers, Code2, Network, Server, Monitor
 } from 'lucide-react'
 
 function SectionTitle({ children }) {
@@ -42,14 +42,14 @@ function StackBadge({ nombre, version, categoria }) {
 }
 
 function MetricCard({ valor, label, color = 'blue' }) {
-  const colorClasses = {
+  const colors = {
     blue: 'from-blue-500/20 to-blue-600/5 border-blue-500/20',
     red: 'from-red-500/20 to-red-600/5 border-red-500/20',
     cyan: 'from-cyan-500/20 to-cyan-600/5 border-cyan-500/20',
     green: 'from-green-500/20 to-green-600/5 border-green-500/20',
   }
   return (
-    <div className={`bg-gradient-to-br ${colorClasses[color]} border rounded-2xl p-5 text-center`}>
+    <div className={`bg-gradient-to-br ${colors[color]} border rounded-2xl p-5 text-center`}>
       <p className="text-3xl font-bold text-white mb-1">{valor}</p>
       <p className="text-sm font-medium text-slate-300">{label}</p>
     </div>
@@ -75,8 +75,6 @@ function TeamCard({ nombre, rol, area }) {
 export default function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-12 pb-16">
-
-      {/* Encabezado */}
       <div className="text-center pt-4 animate-slide-up">
         <div className="relative inline-block mb-6">
           <div className="absolute inset-0 bg-red-500/20 rounded-full blur-2xl" />
@@ -88,64 +86,45 @@ export default function AboutPage() {
           Artery<span className="text-gradient-red">-VA</span>
         </h1>
         <p className="text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
-          Sistema de predicción de riesgo cardiovascular con explicabilidad clínica para médicos.
-          Proyecto integrador de Ingeniería de Sistemas e Ingeniería Biomédica.
+          Sistema de predicción de riesgo cardiovascular basado en clustering con inteligencia artificial,
+          entrenado con datos reales de pacientes colombianos.
         </p>
-        <p className="text-xs text-slate-500 mt-4">
-          Universidad · 2026
-        </p>
+        <p className="text-xs text-slate-500 mt-4">Universidad · 2026</p>
       </div>
 
-      {/* Arquitectura general */}
+      {/* Arquitectura */}
       <section className="animate-slide-up delay-100">
         <SectionTitle><Layers size={20} className="text-blue-400" /> Arquitectura del sistema</SectionTitle>
         <div className="glass-card border border-white/5 rounded-2xl p-6">
           <p className="text-sm text-slate-300 mb-4">
-            Artery-VA sigue una arquitectura <strong>cliente‑servidor</strong> con separación clara de responsabilidades.
-            El frontend, construido con React y Vite, consume una API REST desarrollada en FastAPI.
-            Los modelos de machine learning se ejecutan en el backend sin intervención del navegador.
+            El frontend React envía datos a una API REST en FastAPI. El backend ejecuta un pipeline de
+            <strong> StandardScaler → PCA → Random Forest</strong> para asignar al paciente uno de tres perfiles clínicos.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
             <div className="bg-slate-800/50 rounded-xl p-4">
               <p className="text-xs font-semibold text-red-300 uppercase mb-2">Frontend</p>
-              <p className="text-sm text-slate-400">
-                React 19 · Vite 6 · Tailwind CSS 4 · React Router 7 · Axios · Recharts
-              </p>
+              <p className="text-sm text-slate-400">React 19 · Vite 6 · Tailwind CSS 4 · React Router 7 · Axios · Recharts</p>
             </div>
             <div className="bg-slate-800/50 rounded-xl p-4">
               <p className="text-xs font-semibold text-blue-300 uppercase mb-2">Backend</p>
-              <p className="text-sm text-slate-400">
-                FastAPI · XGBoost · SHAP · LIME · PyMuPDF · pdfplumber · Pydantic v2
-              </p>
+              <p className="text-sm text-slate-400">FastAPI · Random Forest · PCA · PyMuPDF · pdfplumber · Pydantic v2</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Flujo de una predicción */}
+      {/* Flujo */}
       <section className="animate-slide-up delay-200">
         <SectionTitle><Activity size={20} className="text-blue-400" /> Flujo de datos</SectionTitle>
         <div className="glass-card border border-white/5 rounded-2xl divide-y divide-white/5">
-          <FeatureRow
-            icono={Monitor}
-            titulo="1. El médico ingresa datos manuales o sube una historia clínica (JSON / PDF)"
-            descripcion="El frontend envía los datos al endpoint /api/predict o /api/predict/upload según corresponda."
-          />
-          <FeatureRow
-            icono={Server}
-            titulo="2. FastAPI valida los datos con Pydantic y los pasa al servicio de predicción"
-            descripcion="El servicio preprocesa los datos, aplica feature engineering y ejecuta el modelo XGBoost."
-          />
-          <FeatureRow
-            icono={Brain}
-            titulo="3. El modelo retorna riesgo, probabilidad y explicabilidad"
-            descripcion="Se calculan valores SHAP y se generan explicaciones en texto legible para el médico."
-          />
-          <FeatureRow
-            icono={Monitor}
-            titulo="4. El frontend muestra el resultado y los gráficos de explicabilidad"
-            descripcion="ResultCard y ExplainabilityChart presentan la información de forma clara e interpretable."
-          />
+          <FeatureRow icono={Monitor} titulo="1. Entrada de datos"
+            descripcion="El médico ingresa 22 variables clínicas manualmente o sube una historia clínica en JSON/PDF." />
+          <FeatureRow icono={Server} titulo="2. Validación y preprocesamiento"
+            descripcion="FastAPI valida los datos con Pydantic, aplica winsorización de valores atípicos y escala las variables." />
+          <FeatureRow icono={Brain} titulo="3. Predicción por clustering"
+            descripcion="El pipeline PCA + Random Forest asigna al paciente a uno de tres perfiles: Cardio-renal, Cardiovascular Inflamatorio o Bajo Riesgo, con probabilidades." />
+          <FeatureRow icono={Monitor} titulo="4. Visualización de resultados"
+            descripcion="El frontend muestra el perfil asignado, las probabilidades por cluster y, opcionalmente, la comparación con Framingham/SCC." />
         </div>
       </section>
 
@@ -165,27 +144,27 @@ export default function AboutPage() {
               <tr>
                 <td className="px-4 py-3 text-blue-400 font-mono text-xs">POST</td>
                 <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/predict</td>
-                <td className="px-4 py-3 text-slate-400 text-xs">Predicción a partir de formulario manual (11 campos).</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Predicción desde formulario manual (22 campos).</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 text-blue-400 font-mono text-xs">POST</td>
-                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/predict/upload</td>
-                <td className="px-4 py-3 text-slate-400 text-xs">Predicción a partir de un archivo JSON de historia clínica.</td>
+                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/upload</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Predicción desde archivo JSON de historia clínica.</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 text-blue-400 font-mono text-xs">POST</td>
-                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/predict/upload/pdf</td>
-                <td className="px-4 py-3 text-slate-400 text-xs">Predicción a partir de uno o varios PDFs de historia clínica.</td>
+                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/upload/pdf</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Predicción desde archivos PDF de historia clínica.</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 text-blue-400 font-mono text-xs">GET</td>
                 <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/health</td>
-                <td className="px-4 py-3 text-slate-400 text-xs">Verificación de que el servidor y el modelo están operativos.</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Verificación de que el servidor y los artefactos están operativos.</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 text-blue-400 font-mono text-xs">GET</td>
                 <td className="px-4 py-3 text-slate-300 font-mono text-xs">/docs</td>
-                <td className="px-4 py-3 text-slate-400 text-xs">Swagger UI autogenerado con toda la documentación de la API.</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Swagger UI con la documentación completa de la API.</td>
               </tr>
             </tbody>
           </table>
@@ -194,27 +173,18 @@ export default function AboutPage() {
 
       {/* Explicabilidad */}
       <section className="animate-slide-up delay-400">
-        <SectionTitle><Brain size={20} className="text-blue-400" /> Explicabilidad clínica</SectionTitle>
+        <SectionTitle><Brain size={20} className="text-blue-400" /> Interpretación de resultados</SectionTitle>
         <div className="glass-card border border-white/5 rounded-2xl divide-y divide-white/5">
-          <FeatureRow
-            icono={Brain}
-            titulo="SHAP (SHapley Additive exPlanations)"
-            descripcion="Calcula la contribución de cada variable a la predicción individual. Los valores positivos aumentan el riesgo y los negativos lo reducen."
-          />
-          <FeatureRow
-            icono={FileText}
-            titulo="LIME (Local Interpretable Model-agnostic Explanations)"
-            descripcion="Alternativa a SHAP que explica predicciones individuales perturbando los datos de entrada localmente."
-          />
-          <FeatureRow
-            icono={AlertTriangle}
-            titulo="Advertencias de subregistro"
-            descripcion="Las variables autorreportadas (tabaquismo y alcohol) incluyen una nota explícita sobre posible sesgo de subregistro."
-          />
+          <FeatureRow icono={BarChart2} titulo="Probabilidades por perfil clínico"
+            descripcion="El modelo devuelve la probabilidad de pertenencia a cada uno de los tres clusters, permitiendo al médico evaluar la incertidumbre de la clasificación." />
+          <FeatureRow icono={CheckCircle} titulo="Perfiles clínicos definidos por expertos"
+            descripcion="Cada cluster cuenta con una descripción e interpretación clínica validada que incluye recomendaciones específicas (manejo renal, control metabólico, etc.)." />
+          <FeatureRow icono={AlertTriangle} titulo="Datos reales colombianos"
+            descripcion="El modelo fue entrenado con datos de pacientes colombianos, ofreciendo predicciones más relevantes para el contexto local." />
         </div>
       </section>
 
-      {/* Stack tecnológico */}
+      {/* Stack */}
       <section className="animate-slide-up delay-500">
         <SectionTitle><Code2 size={20} className="text-blue-400" /> Stack tecnológico</SectionTitle>
         <div className="space-y-6">
@@ -222,12 +192,11 @@ export default function AboutPage() {
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Backend</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <StackBadge nombre="FastAPI" version="0.115" categoria="backend" />
-              <StackBadge nombre="XGBoost" version="2.1.3" categoria="backend" />
-              <StackBadge nombre="SHAP" version="0.46" categoria="backend" />
+              <StackBadge nombre="scikit-learn" version="1.6" categoria="backend" />
+              <StackBadge nombre="Random Forest" version="—" categoria="backend" />
               <StackBadge nombre="Pydantic v2" version="2.10" categoria="backend" />
               <StackBadge nombre="PyMuPDF" version="1.24" categoria="backend" />
               <StackBadge nombre="pdfplumber" version="0.11" categoria="backend" />
-              <StackBadge nombre="scikit-learn" version="1.6" categoria="backend" />
               <StackBadge nombre="pytest" version="8.3" categoria="backend" />
             </div>
           </div>
@@ -250,18 +219,10 @@ export default function AboutPage() {
               <StackBadge nombre="pandas" version="2.2" categoria="ml" />
               <StackBadge nombre="numpy" version="2.0" categoria="ml" />
               <StackBadge nombre="joblib" version="1.4" categoria="ml" />
+              <StackBadge nombre="PCA" version="—" categoria="ml" />
+              <StackBadge nombre="K-Means" version="—" categoria="ml" />
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Pruebas */}
-      <section className="animate-slide-up delay-500">
-        <SectionTitle><CheckCircle size={20} className="text-blue-400" /> Pruebas del sistema</SectionTitle>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <MetricCard valor="66" label="Pruebas unitarias" color="blue" />
-          <MetricCard valor="3" label="Archivos de test" color="cyan" />
-          <MetricCard valor="3" label="Endpoints probados" color="green" />
         </div>
       </section>
 
@@ -269,19 +230,10 @@ export default function AboutPage() {
       <section className="animate-slide-up delay-500">
         <SectionTitle><Users size={20} className="text-blue-400" /> Equipo de desarrollo</SectionTitle>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <TeamCard
-            nombre="Sebastián Torres Ortega"
-            rol="Desarrollo backend y frontend, Investigación y documentación"
-            area="Ingeniería de Sistemas"
-          />
-          <TeamCard
-            nombre="Mayerlis Acosta Peralta"
-            rol="Investigación y validación clínica"
-            area="Ingeniería Biomédica"
-          />
+          <TeamCard nombre="Sebastián Torres Ortega" rol="Desarrollo backend, frontend e investigación" area="Ingeniería de Sistemas" />
+          <TeamCard nombre="Mayerlis Acosta Peralta" rol="Investigación y validación clínica" area="Ingeniería Biomédica" />
         </div>
       </section>
-
     </div>
   )
 }

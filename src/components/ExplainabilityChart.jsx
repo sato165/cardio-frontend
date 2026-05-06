@@ -1,125 +1,95 @@
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ReferenceLine, ResponsiveContainer, Cell,
+  Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
-import { AlertTriangle, TrendingUp, TrendingDown, Info } from 'lucide-react'
+import { Info } from 'lucide-react'
+
+const NOMBRES_CLUSTER = {
+  0: 'Cardio-renal',
+  1: 'Cardiovascular Inflamatorio',
+  2: 'Bajo Riesgo'
+}
+
+const COLORES = ['#ef4444', '#f59e0b', '#10b981']
 
 const TooltipPersonalizado = ({ active, payload }) => {
   if (!active || !payload?.length) return null
-  const d = payload[0].payload
+  const { name, value } = payload[0]
   return (
-    <div className="bg-slate-800/95 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-4 max-w-xs">
-      <p className="text-sm font-semibold text-white mb-1">{d.factor}</p>
-      <p className="text-xs text-slate-300 leading-relaxed">{d.descripcion}</p>
-      {d.advertencia && (
-        <p className="text-xs text-yellow-400 mt-3 pt-3 border-t border-yellow-500/20 leading-relaxed flex items-start gap-1.5">
-          <AlertTriangle size={12} className="shrink-0 mt-0.5" />
-          {d.advertencia}
-        </p>
-      )}
+    <div className="bg-slate-800/95 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-3">
+      <p className="text-sm font-semibold text-white">{name}</p>
+      <p className="text-sm text-slate-300">{value}%</p>
     </div>
   )
 }
 
-export default function ExplainabilityChart({ explicabilidad }) {
-  if (!explicabilidad?.length) return null
+export default function ExplainabilityChart({ probabilidades }) {
+  if (!probabilidades?.length) return null
 
-  const datos = explicabilidad
-    .slice(0, 10)
-    .map(f => ({ ...f, impactoAbs: Math.abs(f.impacto) }))
-    .sort((a, b) => a.impactoAbs - b.impactoAbs)
-
-  const tieneAdvertencias = datos.some(d => d.advertencia)
+  const datos = probabilidades.map(p => ({
+    name: NOMBRES_CLUSTER[p.cluster_id] || `Cluster ${p.cluster_id}`,
+    value: Math.round(p.probability * 100),
+    cluster_id: p.cluster_id
+  }))
 
   return (
     <div className="glass-card rounded-2xl p-6 border border-white/5 animate-scale-in">
-
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
           <Info size={18} className="text-blue-400" />
-          Factores que influyeron en la predicción
+          Probabilidades por perfil clínico
         </h3>
         <p className="text-xs text-slate-500">
-          Las barras rojas aumentan el riesgo · Las barras azules lo reducen · 
-          El tamaño indica la magnitud del impacto
+          Distribución de probabilidad entre los tres perfiles del modelo
         </p>
       </div>
 
-      <ResponsiveContainer width="100%" height={380}>
+      <ResponsiveContainer width="100%" height={250}>
         <BarChart
           data={datos}
           layout="vertical"
-          margin={{ top: 0, right: 20, left: 140, bottom: 0 }}
+          margin={{ top: 0, right: 20, left: 180, bottom: 0 }}
         >
           <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.05)" />
           <XAxis
             type="number"
-            tickFormatter={v => v.toFixed(2)}
+            domain={[0, 100]}
+            tickFormatter={v => `${v}%`}
             tick={{ fontSize: 11, fill: '#64748b' }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             type="category"
-            dataKey="factor"
-            width={135}
-            tick={{ fontSize: 12, fill: '#cbd5e1' }}
+            dataKey="name"
+            width={170}
+            tick={{ fontSize: 13, fill: '#cbd5e1' }}
             axisLine={false}
             tickLine={false}
           />
           <Tooltip content={<TooltipPersonalizado />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-          <ReferenceLine x={0} stroke="#334155" strokeWidth={1.5} />
-          <Bar dataKey="impacto" radius={[0, 6, 6, 0]} maxBarSize={24}>
+          <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={28}>
             {datos.map((entry, index) => (
-              <Cell
-                key={index}
-                fill={entry.impacto > 0 ? '#ef4444' : '#3b82f6'}
-                fillOpacity={
-                  entry.nivel === 'crítico' ? 1 :
-                  entry.nivel === 'moderado' ? 0.75 : 0.5
-                }
-              />
+              <Cell key={index} fill={COLORES[entry.cluster_id]} fillOpacity={0.85} />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
 
-      <div className="flex flex-wrap items-center gap-6 mt-6 pt-5 border-t border-white/5">
+      <div className="flex flex-wrap items-center gap-6 mt-5 pt-5 border-t border-white/5">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-red-500" />
-          <span className="text-xs text-slate-500">Aumenta el riesgo</span>
+          <span className="text-xs text-slate-500">Cardio-renal</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-blue-500" />
-          <span className="text-xs text-slate-500">Reduce el riesgo</span>
+          <div className="w-3 h-3 rounded-sm bg-amber-500" />
+          <span className="text-xs text-slate-500">Cardiovascular Inflamatorio</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-red-500 opacity-100" />
-          <span className="text-xs text-slate-500">Crítico</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-red-500 opacity-75" />
-          <span className="text-xs text-slate-500">Moderado</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-red-500 opacity-50" />
-          <span className="text-xs text-slate-500">Leve</span>
+          <div className="w-3 h-3 rounded-sm bg-emerald-500" />
+          <span className="text-xs text-slate-500">Bajo Riesgo</span>
         </div>
       </div>
-
-      {tieneAdvertencias && (
-        <div className="mt-5 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl flex gap-3 animate-scale-in">
-          <AlertTriangle className="text-yellow-400 shrink-0 mt-0.5" size={18} />
-          <div className="space-y-1.5">
-            {datos.filter(d => d.advertencia).map((d, i) => (
-              <p key={i} className="text-xs text-yellow-300/80 leading-relaxed">
-                {d.advertencia}
-              </p>
-            ))}
-          </div>
-        </div>
-      )}
-
     </div>
   )
 }

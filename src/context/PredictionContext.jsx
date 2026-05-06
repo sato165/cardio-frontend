@@ -1,14 +1,18 @@
-// PredictionContext.jsx (modificado)
+// PredictionContext.jsx (v2 – dataset real Colombia)
 
 import { createContext, useContext, useReducer } from 'react'
 
 const initialState = {
   manual: {
     fields: {
-      age_years: '', gender: '', height: '', weight: '',
-      ap_hi: '', ap_lo: '', cholesterol: '', gluc: '',
-      smoke: '', alco: '', active: '',
-      colesterol_total_mgdl: '', hdl_mgdl: '', diabetes: '', tratamiento_antihipertensivo: ''
+      // 22 campos obligatorios
+      creatinina: '', celulas_medias: '', glucosa: '', granulocitos: '',
+      hdl: '', hematocrito: '', hemoglobina: '', ldl: '', leucocitos: '',
+      linfocitos: '', plaquetas: '', trigliceridos: '',
+      edad: '', sexo: '', zona: '', ap_hipertension: '',
+      ta_sistolica: '', ta_diastolica: '', peso: '', talla: '', imc: '', TFG: '',
+      // opcionales Framingham
+      colesterol_total_mgdl: '', diabetes: '', tratamiento_antihipertensivo: '', fuma: ''
     },
     result: null,
     error: null,
@@ -20,9 +24,8 @@ const initialState = {
     tipo: null,
     manualValues: {},
     missingFields: [],
-    // NUEVOS CAMPOS
-    framinghamMissing: null,           // lista de {campo, descripcion} que faltan para Framingham
-    framinghamValues: {},              // valores ingresados por el usuario para esos campos
+    framinghamMissing: null,
+    framinghamValues: {},
     result: null,
     error: null,
     loading: false,
@@ -48,7 +51,6 @@ const ActionTypes = {
   SET_UPLOAD_PATIENT: 'SET_UPLOAD_PATIENT',
   RESET_UPLOAD: 'RESET_UPLOAD',
   INCREMENT_FILE_KEY: 'INCREMENT_FILE_KEY',
-  // NUEVAS ACCIONES
   SET_FRAMINGHAM_MISSING: 'SET_FRAMINGHAM_MISSING',
   SET_FRAMINGHAM_VALUES: 'SET_FRAMINGHAM_VALUES',
 }

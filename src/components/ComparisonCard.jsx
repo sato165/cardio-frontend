@@ -29,17 +29,27 @@ function ModelColumn({ titulo, porcentaje, nivel, descripcion, referencia }) {
   )
 }
 
-export default function ComparisonCard({ riesgoComparativo, probabilidadPropia, nivelPropio }) {
+export default function ComparisonCard({ riesgoComparativo }) {
   if (!riesgoComparativo) return null
 
-  const { datos_suficientes, campos_faltantes_framingham, framingham_porcentaje, framingham_nivel, framingham_descripcion,
-    scc_porcentaje, scc_nivel, scc_descripcion, factor_ajuste } = riesgoComparativo
+  const {
+    datos_suficientes,
+    campos_faltantes_framingham,
+    framingham_porcentaje,
+    framingham_nivel,
+    framingham_descripcion,
+    scc_porcentaje,
+    scc_nivel,
+    scc_descripcion,
+    factor_ajuste
+  } = riesgoComparativo
 
   return (
     <div className="space-y-4 animate-slide-up">
       <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-        Comparativa de modelos de riesgo
+        Comparativa de modelos de riesgo (Framingham / SCC)
       </h3>
+
       {!datos_suficientes && campos_faltantes_framingham?.length > 0 && (
         <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-sm text-yellow-300 flex items-start gap-3">
           <AlertTriangle size={18} className="shrink-0 mt-0.5" />
@@ -53,7 +63,8 @@ export default function ComparisonCard({ riesgoComparativo, probabilidadPropia, 
                   hdl_mgdl: 'HDL',
                   diabetes: 'Diabetes',
                   tratamiento_hta: 'Tto. antihipertensivo',
-                  tratamiento_antihipertensivo: 'Tto. antihipertensivo'
+                  tratamiento_antihipertensivo: 'Tto. antihipertensivo',
+                  fuma: 'Fumador'
                 }
                 return map[c] || c
               }).join(', ')}.
@@ -62,14 +73,7 @@ export default function ComparisonCard({ riesgoComparativo, probabilidadPropia, 
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Modelo propio */}
-        <ModelColumn
-          titulo="CardioPredict"
-          porcentaje={Math.round(probabilidadPropia * 100)}
-          nivel={nivelPropio}
-          referencia="Modelo XGBoost entrenado con dataset público"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Framingham */}
         <ModelColumn
           titulo="Framingham 2008"
@@ -78,7 +82,7 @@ export default function ComparisonCard({ riesgoComparativo, probabilidadPropia, 
           descripcion={framingham_descripcion}
           referencia="D'Agostino et al. Circulation 2008"
         />
-        {/* SCC */}
+        {/* SCC Colombia */}
         <ModelColumn
           titulo="SCC Colombia"
           porcentaje={scc_porcentaje}

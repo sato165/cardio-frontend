@@ -1,5 +1,3 @@
-// UploadPage.jsx (actualizado)
-
 import { usePredictionContext } from '../context/PredictionContext'
 import { predecirDesdeJson, predecirDesdePdf } from '../api/cardioApi'
 import FileUpload from '../components/FileUpload'
@@ -56,7 +54,7 @@ export default function UploadPage() {
       dispatch({ type: ActionTypes.SET_FRAMINGHAM_MISSING, payload: null })
     }
 
-    // Si hay predicción (todos los campos obligatorios estaban presentes) la mostramos
+    // Solo si hay predicción (todos los obligatorios presentes)
     if (respuesta.prediccion) {
       dispatch({ type: ActionTypes.SET_UPLOAD_RESULT, payload: respuesta.prediccion })
     }
@@ -109,12 +107,10 @@ export default function UploadPage() {
           {result.riesgo_comparativo && (
             <ComparisonCard
               riesgoComparativo={result.riesgo_comparativo}
-              probabilidadPropia={result.probabilidad}
-              nivelPropio={result.nivel_riesgo}
             />
           )}
 
-          <ExplainabilityChart explicabilidad={result.explicabilidad} />
+          <ExplainabilityChart probabilidades={result.probabilities} />
         </div>
       )}
     </div>
