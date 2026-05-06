@@ -1,7 +1,7 @@
 import {
   HeartPulse, Activity, Shield, Brain, BarChart2,
   AlertTriangle, CheckCircle, Cpu, Database, Users,
-  Layers, Code2, Network, Server, Monitor
+  Layers, Code2, Network, Server, Monitor, Sparkles
 } from 'lucide-react'
 
 function SectionTitle({ children }) {
@@ -32,9 +32,10 @@ function StackBadge({ nombre, version, categoria }) {
     backend:  'bg-blue-500/10 text-blue-400 border-blue-500/20',
     frontend: 'bg-red-500/10 text-red-400 border-red-500/20',
     ml:       'bg-slate-500/10 text-slate-400 border-slate-500/20',
+    explainability: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
   }
   return (
-    <div className={`border rounded-xl px-4 py-3 ${colores[categoria]}`}>
+    <div className={`border rounded-xl px-4 py-3 ${colores[categoria] || colores.ml}`}>
       <p className="text-sm font-semibold text-slate-200">{nombre}</p>
       <p className="text-xs text-slate-500 mt-0.5">{version}</p>
     </div>
@@ -87,7 +88,7 @@ export default function AboutPage() {
         </h1>
         <p className="text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
           Sistema de predicción de riesgo cardiovascular basado en clustering con inteligencia artificial,
-          entrenado con datos reales de pacientes colombianos.
+          entrenado con datos reales de pacientes colombianos. Incluye explicabilidad SHAP para análisis detallado de cada predicción.
         </p>
         <p className="text-xs text-slate-500 mt-4">Universidad · 2026</p>
       </div>
@@ -99,6 +100,8 @@ export default function AboutPage() {
           <p className="text-sm text-slate-300 mb-4">
             El frontend React envía datos a una API REST en FastAPI. El backend ejecuta un pipeline de
             <strong> StandardScaler → PCA → Random Forest</strong> para asignar al paciente uno de tres perfiles clínicos.
+            Adicionalmente, el endpoint de explicabilidad utiliza <strong>SHAP (TreeExplainer)</strong> para calcular la contribución exacta
+            de cada variable a la predicción.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
             <div className="bg-slate-800/50 rounded-xl p-4">
@@ -107,7 +110,7 @@ export default function AboutPage() {
             </div>
             <div className="bg-slate-800/50 rounded-xl p-4">
               <p className="text-xs font-semibold text-blue-300 uppercase mb-2">Backend</p>
-              <p className="text-sm text-slate-400">FastAPI · Random Forest · PCA · PyMuPDF · pdfplumber · Pydantic v2</p>
+              <p className="text-sm text-slate-400">FastAPI · Random Forest · PCA · SHAP · PyMuPDF · pdfplumber · Pydantic v2</p>
             </div>
           </div>
         </div>
@@ -123,8 +126,10 @@ export default function AboutPage() {
             descripcion="FastAPI valida los datos con Pydantic, aplica winsorización de valores atípicos y escala las variables." />
           <FeatureRow icono={Brain} titulo="3. Predicción por clustering"
             descripcion="El pipeline PCA + Random Forest asigna al paciente a uno de tres perfiles: Cardio-renal, Cardiovascular Inflamatorio o Bajo Riesgo, con probabilidades." />
-          <FeatureRow icono={Monitor} titulo="4. Visualización de resultados"
-            descripcion="El frontend muestra el perfil asignado, las probabilidades por cluster y, opcionalmente, la comparación con Framingham/SCC." />
+          <FeatureRow icono={Sparkles} titulo="4. Explicabilidad SHAP"
+            descripcion="Opcionalmente, el médico puede solicitar una explicación detallada de la predicción mediante SHAP, que muestra cómo cada variable contribuyó positiva o negativamente a la asignación del perfil." />
+          <FeatureRow icono={Monitor} titulo="5. Visualización de resultados"
+            descripcion="El frontend muestra el perfil asignado, las probabilidades por cluster, la explicación SHAP y, opcionalmente, la comparación con Framingham/SCC." />
         </div>
       </section>
 
@@ -145,6 +150,11 @@ export default function AboutPage() {
                 <td className="px-4 py-3 text-blue-400 font-mono text-xs">POST</td>
                 <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/predict</td>
                 <td className="px-4 py-3 text-slate-400 text-xs">Predicción desde formulario manual (22 campos).</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-purple-400 font-mono text-xs">POST</td>
+                <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/predict/explain</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Explicabilidad SHAP: devuelve contribuciones de cada variable a la predicción del perfil.</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 text-blue-400 font-mono text-xs">POST</td>
@@ -171,12 +181,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Explicabilidad */}
+      {/* Interpretación de resultados (actualizado con SHAP) */}
       <section className="animate-slide-up delay-400">
         <SectionTitle><Brain size={20} className="text-blue-400" /> Interpretación de resultados</SectionTitle>
         <div className="glass-card border border-white/5 rounded-2xl divide-y divide-white/5">
           <FeatureRow icono={BarChart2} titulo="Probabilidades por perfil clínico"
             descripcion="El modelo devuelve la probabilidad de pertenencia a cada uno de los tres clusters, permitiendo al médico evaluar la incertidumbre de la clasificación." />
+          <FeatureRow icono={Sparkles} titulo="Explicabilidad SHAP"
+            descripcion="SHAP (SHapley Additive exPlanations) desglosa la contribución individual de cada variable a la predicción, destacando qué factores empujaron al paciente hacia un perfil u otro. Se visualiza con un gráfico de barras interactivo." />
           <FeatureRow icono={CheckCircle} titulo="Perfiles clínicos definidos por expertos"
             descripcion="Cada cluster cuenta con una descripción e interpretación clínica validada que incluye recomendaciones específicas (manejo renal, control metabólico, etc.)." />
           <FeatureRow icono={AlertTriangle} titulo="Datos reales colombianos"
@@ -210,6 +222,13 @@ export default function AboutPage() {
               <StackBadge nombre="React Router" version="7.x" categoria="frontend" />
               <StackBadge nombre="Axios" version="1.x" categoria="frontend" />
               <StackBadge nombre="Lucide React" version="0.x" categoria="frontend" />
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Explicabilidad</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <StackBadge nombre="SHAP" version="0.46" categoria="explainability" />
+              <StackBadge nombre="TreeExplainer" version="—" categoria="explainability" />
             </div>
           </div>
           <div>

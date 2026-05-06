@@ -1,7 +1,8 @@
 import { 
   Cpu, Heart, Shield, Activity, FileText,
   AlertTriangle, CheckCircle, BarChart2,
-  ArrowRight, FlaskConical, Info, Layers
+  ArrowRight, FlaskConical, Info, Layers,
+  Sparkles
 } from 'lucide-react'
 
 function SectionTitle({ children, icono: Icon }) {
@@ -62,6 +63,7 @@ export default function RiskModelsPage() {
         <p className="text-slate-400 max-w-2xl mx-auto">
           El sistema utiliza un modelo de clustering con IA entrenado en datos reales colombianos,
           complementado opcionalmente con Framingham 2008 y el ajuste de la SCC.
+          Ahora incluye explicabilidad SHAP para entender cómo cada variable influye en la predicción.
         </p>
       </div>
 
@@ -129,6 +131,18 @@ export default function RiskModelsPage() {
               </h4>
               <p className="text-xs text-slate-400">
                 Datos → StandardScaler → PCA (11 componentes) → Random Forest → Cluster + Probabilidades.
+              </p>
+            </div>
+            {/* Explicabilidad SHAP */}
+            <div className="mt-4 glass-card border border-indigo-500/20 rounded-xl p-4 bg-indigo-500/5">
+              <h4 className="text-sm font-semibold text-indigo-300 mb-2 flex items-center gap-2">
+                <Sparkles size={16} className="text-indigo-400" />
+                Explicabilidad con SHAP
+              </h4>
+              <p className="text-xs text-indigo-200/80">
+                El sistema incorpora <strong>SHAP (SHapley Additive exPlanations)</strong> mediante TreeExplainer.
+                Calcula la contribución exacta de cada una de las 22 variables a la predicción del perfil clínico,
+                permitiendo al médico interpretar por qué el modelo asignó un perfil determinado.
               </p>
             </div>
           </div>
@@ -216,7 +230,7 @@ export default function RiskModelsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
           <div className="text-center">
             <span className="inline-block bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold mb-2">CardioPredict</span>
-            <p className="text-xs text-slate-400">Clustering con Random Forest sobre datos reales colombianos.</p>
+            <p className="text-xs text-slate-400">Clustering con Random Forest sobre datos reales colombianos. Incluye explicabilidad SHAP.</p>
           </div>
           <div className="text-center">
             <span className="inline-block bg-red-500/20 text-red-300 px-3 py-1 rounded-full text-xs font-semibold mb-2">Framingham 2008</span>
