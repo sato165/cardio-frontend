@@ -45,3 +45,9 @@ export async function predecirDesdePdf(archivos, camposManuales = {}) {
   const { data } = await api.post(url, formData)
   return data
 }
+
+// ─── NUEVA: Endpoint de explicabilidad SHAP ────────────────────────────────
+export async function predecirExplain(datos) {
+  const { data } = await api.post('/api/predict/explain', datos)
+  return data
+}

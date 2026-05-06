@@ -1,17 +1,15 @@
-// PredictionContext.jsx (v2 – dataset real Colombia)
+// PredictionContext.jsx (v2 – dataset real Colombia, + explicabilidad SHAP)
 
 import { createContext, useContext, useReducer } from 'react'
 
 const initialState = {
   manual: {
     fields: {
-      // 22 campos obligatorios
       creatinina: '', celulas_medias: '', glucosa: '', granulocitos: '',
       hdl: '', hematocrito: '', hemoglobina: '', ldl: '', leucocitos: '',
       linfocitos: '', plaquetas: '', trigliceridos: '',
       edad: '', sexo: '', zona: '', ap_hipertension: '',
       ta_sistolica: '', ta_diastolica: '', peso: '', talla: '', imc: '', TFG: '',
-      // opcionales Framingham
       colesterol_total_mgdl: '', diabetes: '', tratamiento_antihipertensivo: '', fuma: ''
     },
     result: null,
@@ -31,6 +29,12 @@ const initialState = {
     loading: false,
     patientData: null,
     fileKey: 0
+  },
+  // ─── NUEVO: estado de la explicabilidad SHAP ─────────────────────────
+  explain: {
+    data: null,
+    loading: false,
+    error: null,
   }
 }
 
@@ -53,6 +57,11 @@ const ActionTypes = {
   INCREMENT_FILE_KEY: 'INCREMENT_FILE_KEY',
   SET_FRAMINGHAM_MISSING: 'SET_FRAMINGHAM_MISSING',
   SET_FRAMINGHAM_VALUES: 'SET_FRAMINGHAM_VALUES',
+  // ─── NUEVAS ACCIONES ──────────────────────────────────────────────────
+  SET_EXPLAIN_LOADING: 'SET_EXPLAIN_LOADING',
+  SET_EXPLAIN_DATA: 'SET_EXPLAIN_DATA',
+  SET_EXPLAIN_ERROR: 'SET_EXPLAIN_ERROR',
+  RESET_EXPLAIN: 'RESET_EXPLAIN',
 }
 
 function reducer(state, action) {
@@ -93,6 +102,14 @@ function reducer(state, action) {
       return { ...state, upload: { ...state.upload, framinghamMissing: action.payload } }
     case ActionTypes.SET_FRAMINGHAM_VALUES:
       return { ...state, upload: { ...state.upload, framinghamValues: action.payload } }
+    case ActionTypes.SET_EXPLAIN_LOADING:
+      return { ...state, explain: { ...state.explain, loading: action.payload } }
+    case ActionTypes.SET_EXPLAIN_DATA:
+      return { ...state, explain: { data: action.payload, loading: false, error: null } }
+    case ActionTypes.SET_EXPLAIN_ERROR:
+      return { ...state, explain: { data: null, loading: false, error: action.payload } }
+    case ActionTypes.RESET_EXPLAIN:
+      return { ...state, explain: { ...initialState.explain } }
     default:
       return state
   }

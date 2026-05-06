@@ -1,20 +1,23 @@
 import { usePredictionContext } from '../context/PredictionContext'
-import { predecirDesdeJson, predecirDesdePdf } from '../api/cardioApi'
+import { predecirDesdeJson, predecirDesdePdf, predecirExplain } from '../api/cardioApi'
 import FileUpload from '../components/FileUpload'
 import PatientSummary from '../components/PatientSummary'
 import ResultCard from '../components/ResultCard'
 import ExplainabilityChart from '../components/ExplainabilityChart'
 import ComparisonCard from '../components/ComparisonCard'
+import SHAPChart from '../components/SHAPChart'
 import { AlertCircle, RotateCcw } from 'lucide-react'
 
 export default function UploadPage() {
   const { state, dispatch, ActionTypes } = usePredictionContext()
   const { loading, result, error, patientData } = state.upload
+  const { explain } = state
 
   const handleSubmit = async (archivos, tipo, camposManuales) => {
     dispatch({ type: ActionTypes.SET_UPLOAD_LOADING, payload: true })
     dispatch({ type: ActionTypes.SET_UPLOAD_ERROR, payload: null })
     dispatch({ type: ActionTypes.SET_UPLOAD_MISSING, payload: [] })
+    dispatch({ type: ActionTypes.RESET_EXPLAIN })
 
     try {
       let respuesta
@@ -40,28 +43,39 @@ export default function UploadPage() {
     const combinados = { ...extraidos, ...camposManuales }
     dispatch({ type: ActionTypes.SET_UPLOAD_PATIENT, payload: combinados })
 
-    // Manejo de campos obligatorios faltantes
     if (respuesta.campos_faltantes?.length > 0) {
       dispatch({ type: ActionTypes.SET_UPLOAD_MISSING, payload: respuesta.campos_faltantes })
     } else {
       dispatch({ type: ActionTypes.SET_UPLOAD_MISSING, payload: [] })
     }
 
-    // Manejo de campos opcionales para Framingham
     if (respuesta.framingham_faltante?.length > 0) {
       dispatch({ type: ActionTypes.SET_FRAMINGHAM_MISSING, payload: respuesta.framingham_faltante })
     } else {
       dispatch({ type: ActionTypes.SET_FRAMINGHAM_MISSING, payload: null })
     }
 
-    // Solo si hay predicción (todos los obligatorios presentes)
     if (respuesta.prediccion) {
       dispatch({ type: ActionTypes.SET_UPLOAD_RESULT, payload: respuesta.prediccion })
     }
   }
 
+  const handleExplain = async () => {
+    if (!patientData) return
+    dispatch({ type: ActionTypes.SET_EXPLAIN_LOADING, payload: true })
+    dispatch({ type: ActionTypes.SET_EXPLAIN_ERROR, payload: null })
+    try {
+      const data = await predecirExplain(patientData)
+      dispatch({ type: ActionTypes.SET_EXPLAIN_DATA, payload: data })
+    } catch (err) {
+      const msg = err.response?.data?.error ?? 'Error al obtener explicación.'
+      dispatch({ type: ActionTypes.SET_EXPLAIN_ERROR, payload: msg })
+    }
+  }
+
   const handleReset = () => {
     dispatch({ type: ActionTypes.RESET_UPLOAD })
+    dispatch({ type: ActionTypes.RESET_EXPLAIN })
   }
 
   return (
@@ -102,7 +116,11 @@ export default function UploadPage() {
             </button>
           </div>
           <PatientSummary paciente={patientData} />
-          <ResultCard resultado={result} />
+          <ResultCard
+            resultado={result}
+            onExplain={handleExplain}
+            explainLoading={explain.loading}
+          />
 
           {result.riesgo_comparativo && (
             <ComparisonCard
@@ -111,6 +129,18 @@ export default function UploadPage() {
           )}
 
           <ExplainabilityChart probabilidades={result.probabilities} />
+
+          {/* ─── Explicación SHAP ─────────────────────────────── */}
+          {explain.loading && (
+            <div className="text-center py-4 text-slate-400 text-sm">Cargando explicación SHAP...</div>
+          )}
+          {explain.error && (
+            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+              <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={18} />
+              <p className="text-sm text-red-400/80">{explain.error}</p>
+            </div>
+          )}
+          {explain.data && <SHAPChart explainData={explain.data} />}
         </div>
       )}
     </div>

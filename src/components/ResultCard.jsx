@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Activity, ShieldCheck, AlertTriangle, Heart } from 'lucide-react'
+import { Activity, ShieldCheck, AlertTriangle, Heart, Sparkles } from 'lucide-react'
 
 const CONFIG_CLUSTER = {
   0: {
@@ -64,7 +64,7 @@ function ClusterBar({ cluster, probabilidad, maxProb, animated }) {
   )
 }
 
-export default function ResultCard({ resultado }) {
+export default function ResultCard({ resultado, onExplain, explainLoading }) {
   const [animated, setAnimated] = useState(false)
   const { predicted_cluster, cluster_name, description, probabilities } = resultado || {}
 
@@ -121,6 +121,21 @@ export default function ResultCard({ resultado }) {
             animated={animated}
           />
         ))}
+      </div>
+
+      {/* ─── NUEVO: Botón para explicabilidad SHAP ──────────────────────── */}
+      <div className="mt-6 pt-4 border-t border-white/10">
+        <button
+          onClick={onExplain}
+          disabled={explainLoading}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 text-sm font-medium hover:bg-indigo-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Sparkles size={16} className={explainLoading ? 'animate-pulse' : ''} />
+          {explainLoading ? 'Calculando explicación...' : 'Explicación SHAP'}
+        </button>
+        <p className="text-xs text-slate-500 mt-2">
+          Vea cómo cada variable influye en la predicción del modelo.
+        </p>
       </div>
     </div>
   )

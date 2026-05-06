@@ -1,36 +1,68 @@
+import { useState } from 'react'
 import { AlertCircle, RotateCcw } from 'lucide-react'
 import PredictionForm from '../components/PredictionForm'
 import PatientSummary from '../components/PatientSummary'
 import ResultCard from '../components/ResultCard'
 import ExplainabilityChart from '../components/ExplainabilityChart'
 import ComparisonCard from '../components/ComparisonCard'
+import SHAPChart from '../components/SHAPChart'
 import { usePredictionContext } from '../context/PredictionContext'
-import { predecirManual } from '../api/cardioApi'
+import { predecirManual, predecirExplain } from '../api/cardioApi'
 
 export default function ManualPage() {
   const { state, dispatch, ActionTypes } = usePredictionContext()
   const { loading, result, error, patientData } = state.manual
+  const { explain } = state
+  const [backendErrors, setBackendErrors] = useState({})
 
   const handleSubmit = async (datos) => {
-    // Guardar los datos enviados para mostrarlos en el resumen
     dispatch({ type: ActionTypes.SET_MANUAL_PATIENT, payload: datos })
     dispatch({ type: ActionTypes.SET_MANUAL_LOADING, payload: true })
     dispatch({ type: ActionTypes.SET_MANUAL_ERROR, payload: null })
+    setBackendErrors({})
+    // Limpiar explicación anterior
+    dispatch({ type: ActionTypes.RESET_EXPLAIN })
+
     try {
-      const res = await predecirManual(datos)     // res es PredictionOutput (backend nuevo)
+      const res = await predecirManual(datos)
       dispatch({ type: ActionTypes.SET_MANUAL_RESULT, payload: res })
     } catch (err) {
-      const msg = err.response?.data?.detalle?.[0]?.mensaje ??
-                  err.response?.data?.error ??
-                  'Error al conectar con el servidor.'
-      dispatch({ type: ActionTypes.SET_MANUAL_ERROR, payload: msg })
+      const detail = err.response?.data?.detail
+      if (err.response?.status === 422 && Array.isArray(detail)) {
+        const fieldErrors = {}
+        detail.forEach(({ loc, msg }) => {
+          const field = loc[loc.length - 1]
+          fieldErrors[field] = msg
+        })
+        setBackendErrors(fieldErrors)
+        const primerError = detail[0]?.msg || 'Error de validación'
+        dispatch({ type: ActionTypes.SET_MANUAL_ERROR, payload: primerError })
+      } else {
+        const msg = err.response?.data?.error ?? 'Error al conectar con el servidor.'
+        dispatch({ type: ActionTypes.SET_MANUAL_ERROR, payload: msg })
+      }
     } finally {
       dispatch({ type: ActionTypes.SET_MANUAL_LOADING, payload: false })
     }
   }
 
+  const handleExplain = async () => {
+    if (!patientData) return
+    dispatch({ type: ActionTypes.SET_EXPLAIN_LOADING, payload: true })
+    dispatch({ type: ActionTypes.SET_EXPLAIN_ERROR, payload: null })
+    try {
+      const data = await predecirExplain(patientData)
+      dispatch({ type: ActionTypes.SET_EXPLAIN_DATA, payload: data })
+    } catch (err) {
+      const msg = err.response?.data?.error ?? 'Error al obtener explicación.'
+      dispatch({ type: ActionTypes.SET_EXPLAIN_ERROR, payload: msg })
+    }
+  }
+
   const handleReset = () => {
     dispatch({ type: ActionTypes.RESET_MANUAL })
+    dispatch({ type: ActionTypes.RESET_EXPLAIN })
+    setBackendErrors({})
   }
 
   return (
@@ -45,7 +77,12 @@ export default function ManualPage() {
       </div>
 
       <div className="glass-card rounded-2xl p-8 border border-white/5 animate-slide-up delay-100">
-        <PredictionForm onSubmit={handleSubmit} loading={loading} />
+        <PredictionForm
+          onSubmit={handleSubmit}
+          loading={loading}
+          backendErrors={backendErrors}
+          onFieldChange={() => setBackendErrors({})}
+        />
       </div>
 
       {error && (
@@ -69,21 +106,28 @@ export default function ManualPage() {
               Nueva predicción
             </button>
           </div>
-          {/* PatientSummary mostrará los datos ingresados (formato de 22 campos) */}
           <PatientSummary paciente={patientData} />
-
-          {/* ResultCard muestra el perfil clínico asignado y las probabilidades */}
-          <ResultCard resultado={result} />
-
-          {/* ComparisonCard para Framingham/SCC (si existen datos) */}
+          <ResultCard
+            resultado={result}
+            onExplain={handleExplain}
+            explainLoading={explain.loading}
+          />
           {result.riesgo_comparativo && (
-            <ComparisonCard
-              riesgoComparativo={result.riesgo_comparativo}
-            />
+            <ComparisonCard riesgoComparativo={result.riesgo_comparativo} />
           )}
-
-          {/* ExplainabilityChart ahora muestra las probabilidades por cluster */}
           <ExplainabilityChart probabilidades={result.probabilities} />
+          
+          {/* ─── Explicación SHAP ─────────────────────────────── */}
+          {explain.loading && (
+            <div className="text-center py-4 text-slate-400 text-sm">Cargando explicación SHAP...</div>
+          )}
+          {explain.error && (
+            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+              <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={18} />
+              <p className="text-sm text-red-400/80">{explain.error}</p>
+            </div>
+          )}
+          {explain.data && <SHAPChart explainData={explain.data} />}
         </div>
       )}
     </div>
