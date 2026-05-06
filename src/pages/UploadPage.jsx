@@ -1,3 +1,5 @@
+// UploadPage.jsx (actualizado)
+
 import { usePredictionContext } from '../context/PredictionContext'
 import { predecirDesdeJson, predecirDesdePdf } from '../api/cardioApi'
 import FileUpload from '../components/FileUpload'
@@ -40,9 +42,22 @@ export default function UploadPage() {
     const combinados = { ...extraidos, ...camposManuales }
     dispatch({ type: ActionTypes.SET_UPLOAD_PATIENT, payload: combinados })
 
+    // Manejo de campos obligatorios faltantes
     if (respuesta.campos_faltantes?.length > 0) {
       dispatch({ type: ActionTypes.SET_UPLOAD_MISSING, payload: respuesta.campos_faltantes })
-    } else if (respuesta.prediccion) {
+    } else {
+      dispatch({ type: ActionTypes.SET_UPLOAD_MISSING, payload: [] })
+    }
+
+    // Manejo de campos opcionales para Framingham
+    if (respuesta.framingham_faltante?.length > 0) {
+      dispatch({ type: ActionTypes.SET_FRAMINGHAM_MISSING, payload: respuesta.framingham_faltante })
+    } else {
+      dispatch({ type: ActionTypes.SET_FRAMINGHAM_MISSING, payload: null })
+    }
+
+    // Si hay predicción (todos los campos obligatorios estaban presentes) la mostramos
+    if (respuesta.prediccion) {
       dispatch({ type: ActionTypes.SET_UPLOAD_RESULT, payload: respuesta.prediccion })
     }
   }

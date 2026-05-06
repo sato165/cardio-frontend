@@ -1,12 +1,13 @@
 import { useState, useRef } from 'react'
-import { Upload, FileText, X, AlertCircle, FileJson, File, CheckCircle, Sparkles } from 'lucide-react'
+import { Upload, FileText, X, AlertCircle, FileJson, File, CheckCircle, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
 import { usePredictionContext } from '../context/PredictionContext'
 
 export default function FileUpload({ onSubmit, loading }) {
   const { state, dispatch, ActionTypes } = usePredictionContext()
-  const { files, tipo, manualValues, missingFields } = state.upload
+  const { files, tipo, manualValues, missingFields, framinghamMissing, framinghamValues } = state.upload
   const [errorTipo, setErrorTipo]             = useState(null)
   const [isDragging, setIsDragging]           = useState(false)
+  const [showFramingham, setShowFramingham]   = useState(false)
   const inputRef = useRef(null)
 
   const validarTipo = (archivo) => {
@@ -60,15 +61,27 @@ export default function FileUpload({ onSubmit, loading }) {
     dispatch({ type: ActionTypes.SET_UPLOAD_MANUAL_VALUES, payload: { ...manualValues, [campo]: valor } })
   }
 
+  const handleFraminghamChange = (campo, valor) => {
+    dispatch({ type: ActionTypes.SET_FRAMINGHAM_VALUES, payload: { ...framinghamValues, [campo]: valor } })
+  }
+
   const handleSubmit = () => {
     if (!files.length) return
-    onSubmit(files, tipo, manualValues)
+    // Combinar valores obligatorios (si los hubiera) con los opcionales de Framingham
+    const payloadManual = { ...manualValues, ...framinghamValues }
+    // Eliminar claves con valor vacío
+    const finalManual = Object.fromEntries(
+      Object.entries(payloadManual).filter(([_, v]) => v !== '' && v !== undefined)
+    )
+    onSubmit(files, tipo, finalManual)
   }
 
   const todosCompletos = (missingFields.length === 0) ||
     missingFields.every(c =>
       manualValues[c.campo] !== undefined && manualValues[c.campo] !== ''
     )
+
+  const tieneOpcionalesFramingham = framinghamMissing && framinghamMissing.length > 0
 
   const FileIcon = tipo === 'json' ? FileJson : File
 
@@ -191,6 +204,61 @@ export default function FileUpload({ onSubmit, loading }) {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Sección opcional para datos de Framingham */}
+      {!missingFields.length && tieneOpcionalesFramingham && (
+        <div className="glass-card border border-blue-500/20 rounded-2xl p-6 animate-scale-in">
+          <div 
+            className="flex items-center justify-between cursor-pointer" 
+            onClick={() => setShowFramingham(!showFramingham)}
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-500/10">
+                <CheckCircle className="text-blue-400" size={20} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-200">
+                  Datos para comparación con Framingham y SCC (opcional)
+                </p>
+                <p className="text-xs text-slate-500">
+                  Faltan {framinghamMissing.length} dato(s) para habilitar la comparación con modelos clínicos.
+                </p>
+              </div>
+            </div>
+            {showFramingham ? <ChevronUp className="text-slate-400" size={20} /> : <ChevronDown className="text-slate-400" size={20} />}
+          </div>
+          {showFramingham && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              {framinghamMissing.map(({ campo, descripcion }) => (
+                <div key={campo}>
+                  <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                    {descripcion}
+                  </label>
+                  {campo === 'diabetes' || campo === 'tratamiento_antihipertensivo' || campo === 'tratamiento_hta' ? (
+                    <select
+                      value={framinghamValues[campo] ?? ''}
+                      onChange={(e) => handleFraminghamChange(campo, e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl select-glass text-sm"
+                    >
+                      <option value="">Seleccionar...</option>
+                      <option value="1">Sí</option>
+                      <option value="0">No</option>
+                    </select>
+                  ) : (
+                    <input
+                      type="number"
+                      value={framinghamValues[campo] ?? ''}
+                      onChange={(e) => handleFraminghamChange(campo, e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl input-glass text-sm"
+                      placeholder={`Ingrese ${descripcion.toLowerCase()}`}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

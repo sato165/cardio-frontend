@@ -1,6 +1,7 @@
+// PredictionContext.jsx (modificado)
+
 import { createContext, useContext, useReducer } from 'react'
 
-// Estado inicial
 const initialState = {
   manual: {
     fields: {
@@ -19,15 +20,17 @@ const initialState = {
     tipo: null,
     manualValues: {},
     missingFields: [],
+    // NUEVOS CAMPOS
+    framinghamMissing: null,           // lista de {campo, descripcion} que faltan para Framingham
+    framinghamValues: {},              // valores ingresados por el usuario para esos campos
     result: null,
     error: null,
     loading: false,
     patientData: null,
-    fileKey: 0 // para forzar la recreación del input file al resetear
+    fileKey: 0
   }
 }
 
-// Acciones
 const ActionTypes = {
   SET_MANUAL_FIELDS: 'SET_MANUAL_FIELDS',
   SET_MANUAL_RESULT: 'SET_MANUAL_RESULT',
@@ -44,7 +47,10 @@ const ActionTypes = {
   SET_UPLOAD_LOADING: 'SET_UPLOAD_LOADING',
   SET_UPLOAD_PATIENT: 'SET_UPLOAD_PATIENT',
   RESET_UPLOAD: 'RESET_UPLOAD',
-  INCREMENT_FILE_KEY: 'INCREMENT_FILE_KEY'
+  INCREMENT_FILE_KEY: 'INCREMENT_FILE_KEY',
+  // NUEVAS ACCIONES
+  SET_FRAMINGHAM_MISSING: 'SET_FRAMINGHAM_MISSING',
+  SET_FRAMINGHAM_VALUES: 'SET_FRAMINGHAM_VALUES',
 }
 
 function reducer(state, action) {
@@ -62,7 +68,7 @@ function reducer(state, action) {
     case ActionTypes.RESET_MANUAL:
       return { ...state, manual: { ...initialState.manual } }
     case ActionTypes.SET_UPLOAD_FILES:
-      return { ...state, upload: { ...state.upload, files: action.payload.files, tipo: action.payload.tipo, manualValues: {}, missingFields: [] } }
+      return { ...state, upload: { ...state.upload, files: action.payload.files, tipo: action.payload.tipo, manualValues: {}, missingFields: [], framinghamMissing: null, framinghamValues: {} } }
     case ActionTypes.SET_UPLOAD_TIPO:
       return { ...state, upload: { ...state.upload, tipo: action.payload } }
     case ActionTypes.SET_UPLOAD_MANUAL_VALUES:
@@ -81,6 +87,10 @@ function reducer(state, action) {
       return { ...state, upload: { ...initialState.upload, fileKey: state.upload.fileKey + 1 } }
     case ActionTypes.INCREMENT_FILE_KEY:
       return { ...state, upload: { ...state.upload, fileKey: state.upload.fileKey + 1 } }
+    case ActionTypes.SET_FRAMINGHAM_MISSING:
+      return { ...state, upload: { ...state.upload, framinghamMissing: action.payload } }
+    case ActionTypes.SET_FRAMINGHAM_VALUES:
+      return { ...state, upload: { ...state.upload, framinghamValues: action.payload } }
     default:
       return state
   }

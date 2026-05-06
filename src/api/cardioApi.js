@@ -1,3 +1,5 @@
+// cardioApi.js 
+
 import axios from 'axios'
 
 const api = axios.create({
@@ -14,7 +16,7 @@ export async function predecirDesdeJson(archivo, camposManuales = {}) {
   const formData = new FormData()
   formData.append('archivo', archivo)
 
-  // Si hay campos manuales los enviamos como query params
+  // Agregar todos los campos manuales (incluidos los de Framingham) como query params
   const params = new URLSearchParams()
   Object.entries(camposManuales).forEach(([k, v]) => {
     if (v !== '' && v !== undefined) params.append(k, v)
