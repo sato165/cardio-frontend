@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell, LabelList,
 } from 'recharts'
-import { Sparkles, ChevronDown } from 'lucide-react'
+import { Sparkles, ChevronDown, Info } from 'lucide-react'
 
 const CLUSTER_COLORS = ['#ef4444', '#f59e0b', '#10b981']
 const CLUSTER_NAMES = {
@@ -12,20 +12,113 @@ const CLUSTER_NAMES = {
   2: 'Bajo Riesgo'
 }
 
-const TooltipPersonalizado = ({ active, payload }) => {
+// Componente personalizado para cada barra del waterfall
+const WaterfallBar = (props) => {
+  const { x, y, width, height, fill, payload } = props
+  if (!payload) return null
+  // payload.isBase => barra del valor base, se dibuja solo el contorno
+  if (payload.isBase) {
+    return (
+      <g>
+        <rect x={x} y={y} width={width} height={height} fill="transparent" stroke="#6366f1" strokeWidth={2} strokeDasharray="4 4" />
+        <text x={x + width + 4} y={y + height/2} textAnchor="start" dominantBaseline="middle" fill="#818cf8" fontSize={12} className="font-mono">
+          {payload.value.toFixed(3)}
+        </text>
+      </g>
+    )
+  }
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={height} fill={fill} fillOpacity={0.9} rx={2} />
+      {/* Etiqueta interna con el valor shap */}
+      <text x={x + width + 4} y={y + height/2} textAnchor="start" dominantBaseline="middle" fill="#cbd5e1" fontSize={11} className="font-mono">
+        {payload.delta >= 0 ? '+' : ''}{payload.delta.toFixed(4)}
+      </text>
+    </g>
+  )
+}
+
+// Tooltip personalizado
+const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null
-  const { feature, shap_value } = payload[0].payload
-  const val = shap_value
-  const impacto = val > 0 ? 'Aumenta el riesgo para este perfil' : 'Reduce el riesgo para este perfil'
+  const p = payload[0].payload
+  if (p.isBase) {
+    return (
+      <div className="bg-slate-800/95 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-3 max-w-xs">
+        <p className="text-sm font-semibold text-white">Valor base</p>
+        <p className="text-xs text-slate-400">Predicción promedio para este perfil (log‑odds)</p>
+        <p className="font-mono text-indigo-400">{p.value.toFixed(4)}</p>
+      </div>
+    )
+  }
+  const feature = p.name.split('(')[0] // extract feature name
+  const patientValue = p.feature_value ?? '?'
+  const impacto = p.delta > 0 ? 'Aumenta el riesgo para este perfil' : 'Reduce el riesgo para este perfil'
   return (
     <div className="bg-slate-800/95 backdrop-blur-lg border border-slate-700 rounded-xl shadow-2xl p-3 max-w-xs">
       <p className="text-sm font-semibold text-white capitalize">{feature}</p>
-      <p className={`text-sm font-mono ${val >= 0 ? 'text-red-400' : 'text-green-400'}`}>
-        {val >= 0 ? '+' : ''}{val.toFixed(4)}
+      <p className="text-xs text-slate-500">Valor del paciente: {patientValue}</p>
+      <p className={`text-sm font-mono ${p.delta >= 0 ? 'text-red-400' : 'text-green-400'}`}>
+        {p.delta >= 0 ? '+' : ''}{p.delta.toFixed(4)} log‑odds
       </p>
-      <p className="text-xs text-slate-500 mt-1">{impacto}</p>
+      <p className="text-xs text-slate-400 mt-1">{impacto}</p>
     </div>
   )
+}
+
+// Función para construir los datos del waterfall a partir de explainData
+function buildWaterfallData(explainData, clusterId) {
+  const { shap_values, base_values } = explainData
+  const clusterKey = CLUSTER_NAMES[clusterId]
+  const features = shap_values[clusterKey] || []
+  const base = base_values[clusterKey]
+
+  if (!features.length) return { data: [], finalScore: base }
+
+  // Ordenar por valor absoluto
+  const sorted = [...features].sort((a, b) => Math.abs(b.shap_value) - Math.abs(a.shap_value))
+  const topN = 10
+  const top = sorted.slice(0, topN)
+  const otherFeatures = sorted.slice(topN)
+  const otherShap = otherFeatures.reduce((sum, f) => sum + f.shap_value, 0)
+
+  const waterfallData = []
+
+  // Barra del valor base
+  waterfallData.push({
+    name: 'Valor base',
+    value: base,
+    delta: 0,
+    cumulative: base,
+    isBase: true,
+    fill: '#6366f1',
+  })
+
+  let cumulative = base
+  top.forEach((f) => {
+    cumulative += f.shap_value
+    waterfallData.push({
+      name: `${f.feature} (${f.feature_value})`,
+      value: cumulative, // necesario para la posición
+      delta: f.shap_value,
+      cumulative,
+      feature_value: f.feature_value,
+      fill: f.shap_value >= 0 ? '#ef4444' : '#10b981',
+    })
+  })
+
+  if (otherFeatures.length > 0) {
+    cumulative += otherShap
+    waterfallData.push({
+      name: `Otras (${otherFeatures.length} variables)`,
+      value: cumulative,
+      delta: otherShap,
+      cumulative,
+      fill: otherShap >= 0 ? '#ef4444' : '#10b981',
+    })
+  }
+
+  return { data: waterfallData, finalScore: cumulative }
 }
 
 export default function SHAPChart({ explainData }) {
@@ -33,23 +126,14 @@ export default function SHAPChart({ explainData }) {
     explainData?.predicted_cluster ?? 0
   )
 
-  if (!explainData) return null
+  const waterfall = useMemo(() => {
+    if (!explainData) return null
+    return buildWaterfallData(explainData, selectedCluster)
+  }, [explainData, selectedCluster])
 
-  const { shap_values, base_values, predicted_cluster, cluster_name } = explainData
-  const clusterId = selectedCluster
-  const clusterKey = CLUSTER_NAMES[clusterId]
-  const features = shap_values[clusterKey] || []
-  // Ordenar por valor absoluto descendente
-  const sorted = [...features]
-    .sort((a, b) => Math.abs(b.shap_value) - Math.abs(a.shap_value))
-  // Limitar a las 15 más importantes para claridad
-  const top = sorted.slice(0, 15)
+  if (!waterfall) return null
 
-  const dataChart = top.map(f => ({
-    feature: f.feature,
-    shap_value: f.shap_value,
-    fill: f.shap_value >= 0 ? '#ef4444' : '#10b981'
-  }))
+  const { data, finalScore } = waterfall
 
   return (
     <div className="glass-card rounded-2xl p-6 border border-white/5 animate-scale-in">
@@ -57,10 +141,10 @@ export default function SHAPChart({ explainData }) {
         <div>
           <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
             <Sparkles size={18} className="text-indigo-400" />
-            Explicación SHAP
+            Explicación detallada (Waterfall)
           </h3>
           <p className="text-xs text-slate-500">
-            Contribución de cada variable a la predicción del perfil seleccionado
+            Contribución de cada variable al score del perfil seleccionado. Se parte del valor base (riesgo promedio) y cada barra muestra el cambio en log‑odds.
           </p>
         </div>
         {/* Selector de perfil */}
@@ -72,7 +156,7 @@ export default function SHAPChart({ explainData }) {
           >
             {Object.entries(CLUSTER_NAMES).map(([id, name]) => (
               <option key={id} value={id}>
-                {name} {Number(id) === predicted_cluster ? '(predicho)' : ''}
+                {name} {Number(id) === explainData.predicted_cluster ? '(predicho)' : ''}
               </option>
             ))}
           </select>
@@ -80,11 +164,11 @@ export default function SHAPChart({ explainData }) {
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={Math.max(350, top.length * 24)}>
+      <ResponsiveContainer width="100%" height={Math.max(400, data.length * 28)}>
         <BarChart
-          data={dataChart}
+          data={data}
           layout="vertical"
-          margin={{ top: 0, right: 60, left: 120, bottom: 0 }}
+          margin={{ top: 0, right: 80, left: 160, bottom: 0 }}
         >
           <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.05)" />
           <XAxis
@@ -95,32 +179,36 @@ export default function SHAPChart({ explainData }) {
           />
           <YAxis
             type="category"
-            dataKey="feature"
+            dataKey="name"
             tick={{ fontSize: 12, fill: '#cbd5e1' }}
             axisLine={false}
             tickLine={false}
-            width={110}
+            width={150}
           />
-          <Tooltip content={<TooltipPersonalizado />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-          <Bar dataKey="shap_value" radius={[0, 4, 4, 0]} maxBarSize={20}>
-            {dataChart.map((entry, idx) => (
-              <Cell key={idx} fill={entry.fill} fillOpacity={0.85} />
-            ))}
-            <LabelList
-              dataKey="shap_value"
-              position="right"
-              formatter={v => v.toFixed(3)}
-              style={{ fontSize: '10px', fill: '#94a3b8' }}
-            />
-          </Bar>
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+          <Bar
+            dataKey="value"
+            shape={<WaterfallBar />}
+            // Para que Recharts no apile, usamos un único bar
+            barSize={18}
+          />
         </BarChart>
       </ResponsiveContainer>
 
-      {base_values && (
-        <div className="mt-4 text-xs text-slate-500">
-          Valor base (intercepto) para <span className="text-white font-medium">{clusterKey}</span>: <span className="font-mono text-slate-300">{base_values[clusterKey]?.toFixed(4)}</span>
+      {/* Resumen final */}
+      <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500">
+        <div>
+          Valor base (promedio): <span className="font-mono text-indigo-300">{data[0]?.value.toFixed(4)}</span>
         </div>
-      )}
+        <div>
+          Score final para <span className="text-white font-medium">{CLUSTER_NAMES[selectedCluster]}</span>:
+          <span className="font-mono text-white ml-1">{finalScore.toFixed(4)}</span>
+        </div>
+        <div className="flex items-center gap-1 ml-auto">
+          <Info size={12} />
+          <span>Los valores están en escala log‑odds. Cuanto mayor, más probable es el perfil.</span>
+        </div>
+      </div>
     </div>
   )
 }

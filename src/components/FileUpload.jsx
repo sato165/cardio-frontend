@@ -172,7 +172,7 @@ export default function FileUpload({ onSubmit, loading }) {
       payloadManual.talla = parseFloat(payloadManual.talla) / 100
     }
     const finalManual = Object.fromEntries(
-      Object.entries(payloadManual).filter(([_, v]) => v !== '' && v !== undefined)
+      Object.entries(payloadManual).filter(([, v]) => v !== '' && v !== undefined)
     )
     onSubmit(files, tipo, finalManual)
   }
