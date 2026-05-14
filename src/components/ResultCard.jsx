@@ -37,13 +37,12 @@ const CONFIG_CLUSTER = {
   }
 }
 
-function ClusterBar({ cluster, probabilidad, maxProb, animated }) {
-  const cfg = CONFIG_CLUSTER[cluster] || CONFIG_CLUSTER[1]
+function ProbabilityBar({ probabilidad, animated, cfg }) {
   const pct = Math.round(probabilidad * 100)
-  const width = animated ? (probabilidad / maxProb) * 100 : 0
+  const width = animated ? pct : 0
 
   return (
-    <div className="flex items-center gap-3 mb-3 last:mb-0">
+    <div className="flex items-center gap-3">
       <div className="w-32 text-right">
         <span className={`text-xs font-medium ${cfg.text}`}>
           {cfg.nombre}
@@ -71,7 +70,9 @@ export default function ResultCard({ resultado, onExplain, explainLoading }) {
   const clusterPrincipal = predicted_cluster ?? 1
   const cfg = CONFIG_CLUSTER[clusterPrincipal] || CONFIG_CLUSTER[1]
   const Icono = cfg.icono
-  const maxProb = probabilities?.length ? Math.max(...probabilities.map(p => p.probability)) : 1
+
+  // Buscar la probabilidad del clúster principal
+  const probabilidadPrincipal = probabilities?.find(p => p.cluster_id === clusterPrincipal)?.probability ?? 0
 
   useEffect(() => {
     const timer = setTimeout(() => setAnimated(true), 100)
@@ -107,23 +108,19 @@ export default function ResultCard({ resultado, onExplain, explainLoading }) {
         </p>
       </div>
 
-      {/* Barras de probabilidad por perfil */}
+      {/* Barra de probabilidad del perfil principal */}
       <div>
         <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">
-          Probabilidades por perfil
+          Probabilidad de este perfil
         </p>
-        {probabilities?.map((p) => (
-          <ClusterBar
-            key={p.cluster_id}
-            cluster={p.cluster_id}
-            probabilidad={p.probability}
-            maxProb={maxProb}
-            animated={animated}
-          />
-        ))}
+        <ProbabilityBar
+          probabilidad={probabilidadPrincipal}
+          animated={animated}
+          cfg={cfg}
+        />
       </div>
 
-      {/* ─── NUEVO: Botón para explicabilidad SHAP ──────────────────────── */}
+      {/* Botón SHAP */}
       <div className="mt-6 pt-4 border-t border-white/10">
         <button
           onClick={onExplain}
