@@ -1,3 +1,4 @@
+// ManualPage.jsx
 import { useState } from 'react'
 import { AlertCircle, RotateCcw } from 'lucide-react'
 import PredictionForm from '../components/PredictionForm'
@@ -19,7 +20,6 @@ export default function ManualPage() {
     dispatch({ type: ActionTypes.SET_MANUAL_LOADING, payload: true })
     dispatch({ type: ActionTypes.SET_MANUAL_ERROR, payload: null })
     setBackendErrors({})
-    // Limpiar explicación anterior
     dispatch({ type: ActionTypes.RESET_EXPLAIN })
 
     try {
@@ -65,17 +65,17 @@ export default function ManualPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-8 animate-slide-up">
-        <h1 className="text-3xl font-bold text-white mb-2">
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="mb-8 text-center md:text-left">
+        <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
           Formulario Manual
         </h1>
-        <p className="text-slate-400 text-sm">
-          Complete los datos clínicos del paciente. Todos los campos son requeridos.
+        <p className="text-slate-300 text-base max-w-2xl">
+          Complete los datos clínicos del paciente. Todos los campos con <span className="text-red-400">*</span> son requeridos.
         </p>
       </div>
 
-      <div className="glass-card rounded-2xl p-8 border border-white/5 animate-slide-up delay-100">
+      <div className="bg-slate-900/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 shadow-xl p-6 md:p-8 transition-all">
         <PredictionForm
           onSubmit={handleSubmit}
           loading={loading}
@@ -85,23 +85,23 @@ export default function ManualPage() {
       </div>
 
       {error && (
-        <div className="mt-6 flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl animate-scale-in">
+        <div className="mt-6 flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-xl animate-in fade-in slide-in-from-bottom-2">
           <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={18} />
           <div>
             <p className="text-sm font-semibold text-red-300 mb-0.5">Error en la predicción</p>
-            <p className="text-sm text-red-400/80">{error}</p>
+            <p className="text-sm text-red-300/80">{error}</p>
           </div>
         </div>
       )}
 
       {result && (
-        <div className="mt-8 space-y-6">
-          <div className="flex justify-end animate-fade-in">
+        <div className="mt-10 space-y-6">
+          <div className="flex justify-end">
             <button
               onClick={handleReset}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 bg-slate-800/50 hover:bg-slate-700/70 hover:text-white border border-slate-700 transition-all duration-200"
             >
-              <RotateCcw size={14} />
+              <RotateCcw size={15} />
               Nueva predicción
             </button>
           </div>
@@ -115,14 +115,16 @@ export default function ManualPage() {
             <ComparisonCard riesgoComparativo={result.riesgo_comparativo} />
           )}
           
-          {/* ─── Explicación SHAP ─────────────────────────────── */}
           {explain.loading && (
-            <div className="text-center py-4 text-slate-400 text-sm">Cargando explicación SHAP...</div>
+            <div className="text-center py-6 text-slate-300 bg-slate-800/30 rounded-xl">
+              <div className="inline-block w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mr-2"></div>
+              Cargando explicación SHAP...
+            </div>
           )}
           {explain.error && (
-            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+            <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
               <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={18} />
-              <p className="text-sm text-red-400/80">{explain.error}</p>
+              <p className="text-sm text-red-300/80">{explain.error}</p>
             </div>
           )}
           {explain.data && <SHAPChart explainData={explain.data} />}
