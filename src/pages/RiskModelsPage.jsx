@@ -44,6 +44,7 @@ function MetricBadge({ valor, label, color }) {
     blue: 'border-blue-500/20 bg-blue-500/10 text-blue-400',
     green: 'border-green-500/20 bg-green-500/10 text-green-400',
     amber: 'border-yellow-500/20 bg-yellow-500/10 text-yellow-400',
+    red: 'border-red-500/20 bg-red-500/10 text-red-400',
   }
   return (
     <div className={`border rounded-xl px-4 py-3 text-center ${col[color]}`}>
@@ -63,11 +64,11 @@ export default function RiskModelsPage() {
         <p className="text-slate-400 max-w-2xl mx-auto">
           El sistema utiliza un modelo de clustering con IA entrenado en datos reales colombianos,
           complementado opcionalmente con Framingham 2008 y el ajuste de la SCC.
-          Ahora incluye explicabilidad SHAP para entender cómo cada variable influye en la predicción.
+          Incluye explicabilidad SHAP para entender cómo cada variable influye en la predicción.
         </p>
       </div>
 
-      {/* CardioPredict (nuevo) */}
+      {/* CardioPredict – modelo final del notebook */}
       <ModelDetailCard 
         titulo="1. CardioPredict – Clustering con Random Forest"
         icono={Cpu}
@@ -75,13 +76,13 @@ export default function RiskModelsPage() {
       >
         <p className="text-sm text-slate-300 mb-4">
           Modelo basado en <strong>Random Forest</strong> entrenado con un dataset real de pacientes colombianos
-          (sin variable objetivo). Se crearon <strong>3 clusters clínicos</strong> mediante <strong>K-Means + PCA</strong>,
+          (sin variable objetivo). Se crearon <strong>4 clusters clínicos</strong> mediante <strong>K-Means + PCA</strong>,
           que sirven como "objetivo" para el clasificador supervisado.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
           <div>
-            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Variables de entrada (22)</h4>
+            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Variables de entrada (19)</h4>
             <div className="glass-card border border-white/5 rounded-xl overflow-hidden">
               <table className="w-full text-xs">
                 <thead className="bg-slate-800/60">
@@ -92,36 +93,51 @@ export default function RiskModelsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <FeatureRow variable="Edad" tipo="Numérica" unidad="años" descripcion="Edad del paciente." />
-                  <FeatureRow variable="Sexo" tipo="Binaria" descripcion="0 = Mujer, 1 = Hombre." />
-                  <FeatureRow variable="Zona" tipo="Binaria" descripcion="0 = Rural, 1 = Urbana." />
-                  <FeatureRow variable="Creatinina, Glucosa, HDL, LDL, Triglicéridos" tipo="Numéricas" unidad="mg/dL" descripcion="Exámenes de laboratorio." />
-                  <FeatureRow variable="Hemoglobina, Hematocrito, Leucocitos, Linfocitos, Granulocitos, Plaquetas" tipo="Numéricas" unidad="varias" descripcion="Hemograma completo." />
-                  <FeatureRow variable="Presión sistólica/diastólica" tipo="Numéricas" unidad="mmHg" descripcion="Signos vitales." />
-                  <FeatureRow variable="Peso, Talla, IMC" tipo="Numéricas" unidad="kg, m, kg/m²" descripcion="Antropometría." />
-                  <FeatureRow variable="TFG" tipo="Numérica" unidad="mL/min/1.73m²" descripcion="Función renal." />
-                  <FeatureRow variable="Antecedente HTA" tipo="Binaria" descripcion="0 = No, 1 = Sí." />
+                  <FeatureRow variable="c_total" tipo="Numérica" unidad="mg/dL" descripcion="Colesterol total." />
+                  <FeatureRow variable="creatinina" tipo="Numérica" unidad="mg/dL" descripcion="Función renal." />
+                  <FeatureRow variable="glucosa" tipo="Numérica" unidad="mg/dL" descripcion="Glicemia en ayunas." />
+                  <FeatureRow variable="hdl" tipo="Numérica" unidad="mg/dL" descripcion="Colesterol HDL." />
+                  <FeatureRow variable="hemoglobina" tipo="Numérica" unidad="g/dL" descripcion="Hemoglobina." />
+                  <FeatureRow variable="ldl" tipo="Numérica" unidad="mg/dL" descripcion="Colesterol LDL." />
+                  <FeatureRow variable="leucocitos" tipo="Numérica" unidad="10³/µL" descripcion="Leucocitos." />
+                  <FeatureRow variable="plaquetas" tipo="Numérica" unidad="10³/µL" descripcion="Plaquetas." />
+                  <FeatureRow variable="trigliceridos" tipo="Numérica" unidad="mg/dL" descripcion="Triglicéridos." />
+                  <FeatureRow variable="edad" tipo="Numérica" unidad="años" descripcion="Edad del paciente." />
+                  <FeatureRow variable="sexo" tipo="Binaria" descripcion="0 = Mujer, 1 = Hombre." />
+                  <FeatureRow variable="zona" tipo="Binaria" descripcion="0 = Rural, 1 = Urbana." />
+                  <FeatureRow variable="ap_hipertension" tipo="Binaria" descripcion="Antecedente personal de HTA." />
+                  <FeatureRow variable="ta_sistolica" tipo="Numérica" unidad="mmHg" descripcion="Presión sistólica." />
+                  <FeatureRow variable="ta_diastolica" tipo="Numérica" unidad="mmHg" descripcion="Presión diastólica." />
+                  <FeatureRow variable="peso" tipo="Numérica" unidad="kg" descripcion="Peso corporal." />
+                  <FeatureRow variable="talla" tipo="Numérica" unidad="m" descripcion="Talla en metros." />
+                  <FeatureRow variable="imc" tipo="Numérica" unidad="kg/m²" descripcion="Índice de masa corporal." />
+                  <FeatureRow variable="TFG" tipo="Numérica" unidad="mL/min/1.73m²" descripcion="Filtración glomerular." />
                 </tbody>
               </table>
             </div>
           </div>
           <div>
-            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Perfiles clínicos (clusters)</h4>
+            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Perfiles clínicos (clusters – k=4)</h4>
             <div className="glass-card border border-white/5 rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-red-500" />
-                <span className="text-sm text-slate-300 font-medium">Cardio-renal:</span>
-                <span className="text-xs text-slate-400">Disfunción renal + alteración lipídica.</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-yellow-500" />
-                <span className="text-sm text-slate-300 font-medium">Cardiovascular Inflamatorio:</span>
-                <span className="text-xs text-slate-400">PA elevada + glucosa en prediabetes.</span>
+                <span className="text-sm text-slate-300 font-medium">Cardiovascular:</span>
+                <span className="text-xs text-slate-400">Alteración lipídica predominante con riesgo cardiovascular elevado.</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="text-sm text-slate-300 font-medium">Bajo Riesgo:</span>
-                <span className="text-xs text-slate-400">Mantener hábitos saludables.</span>
+                <span className="text-sm text-slate-300 font-medium">Bajo riesgo:</span>
+                <span className="text-xs text-slate-400">Perfil saludable, mantener hábitos y revisión anual.</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-yellow-500" />
+                <span className="text-sm text-slate-300 font-medium">Cardiometabólico:</span>
+                <span className="text-xs text-slate-400">Resistencia metabólica + perfil lipídico alterado.</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-purple-500" />
+                <span className="text-sm text-slate-300 font-medium">Cardiorrenal:</span>
+                <span className="text-xs text-slate-400">Disfunción renal + alteración lipídica.</span>
               </div>
             </div>
             <div className="mt-4 glass-card border border-white/10 rounded-xl p-4">
@@ -130,7 +146,7 @@ export default function RiskModelsPage() {
                 Pipeline de inferencia
               </h4>
               <p className="text-xs text-slate-400">
-                Datos → StandardScaler → PCA (11 componentes) → Random Forest → Cluster + Probabilidades.
+                Datos → Winsorización experta → KNN Imputer → StandardScaler → PCA (11 componentes) → Random Forest → Cluster + Probabilidades.
               </p>
             </div>
             {/* Explicabilidad SHAP */}
@@ -141,7 +157,7 @@ export default function RiskModelsPage() {
               </h4>
               <p className="text-xs text-indigo-200/80">
                 El sistema incorpora <strong>SHAP (SHapley Additive exPlanations)</strong> mediante TreeExplainer.
-                Calcula la contribución exacta de cada una de las 22 variables a la predicción del perfil clínico,
+                Calcula la contribución exacta de cada una de las 19 variables a la predicción del perfil clínico,
                 permitiendo al médico interpretar por qué el modelo asignó un perfil determinado.
               </p>
             </div>
@@ -149,25 +165,25 @@ export default function RiskModelsPage() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-          <MetricBadge valor="3" label="Clusters" color="blue" />
+          <MetricBadge valor="4" label="Clusters" color="blue" />
           <MetricBadge valor="11" label="Componentes PCA" color="green" />
           <MetricBadge valor="150" label="Árboles (RF)" color="amber" />
-          <MetricBadge valor="22" label="Features" color="blue" />
+          <MetricBadge valor="19" label="Features" color="blue" />
         </div>
 
         <div className="flex items-start gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
           <CheckCircle size={18} className="text-green-400 shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-green-300">Dataset real colombiano</p>
+            <p className="text-sm font-medium text-green-300">Dataset real colombiano + validación externa</p>
             <p className="text-xs text-green-400/70 mt-1">
-              A diferencia del modelo anterior (Kaggle sintético), este modelo se entrenó con datos reales de pacientes colombianos,
-              lo que proporciona predicciones más ajustadas al contexto local.
+              El modelo se entrenó con datos reales de pacientes colombianos y se validó con una cohorte externa anónima,
+              asegurando predicciones ajustadas al contexto local.
             </p>
           </div>
         </div>
       </ModelDetailCard>
 
-      {/* Framingham 2008 (se mantiene similar) */}
+      {/* Framingham 2008 */}
       <ModelDetailCard 
         titulo="2. Framingham 2008 (D'Agostino)"
         icono={Heart}

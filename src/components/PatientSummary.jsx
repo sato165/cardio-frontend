@@ -46,11 +46,14 @@ function Separador() {
 export default function PatientSummary({ paciente }) {
   if (!paciente) return null
 
-  // Formateadores rápidos
+  // Formateadores
   const siNo = (v) => v === 1 || v === '1' ? 'Sí' : v === 0 || v === '0' ? 'No' : null
   const sexoNombre = (v) => v === 0 || v === '0' ? 'Mujer' : v === 1 || v === '1' ? 'Hombre' : null
   const zonaNombre = (v) => v === 0 || v === '0' ? 'Rural' : v === 1 || v === '1' ? 'Urbana' : null
   const conUnidad = (valor, unidad) => valor != null ? `${valor} ${unidad}` : null
+
+  // Convertir talla de cm a metros para mostrar (el backend trabaja en cm)
+  const tallaEnMetros = paciente.talla != null ? (paciente.talla / 100).toFixed(2) : null
 
   return (
     <div className="glass-card rounded-2xl p-6 border border-white/5 animate-scale-in">
@@ -113,7 +116,7 @@ export default function PatientSummary({ paciente }) {
           <Dato label="Presión sistólica" valor={conUnidad(paciente.ta_sistolica, 'mmHg')} />
           <Dato label="Presión diastólica" valor={conUnidad(paciente.ta_diastolica, 'mmHg')} />
           <Dato label="Peso" valor={conUnidad(paciente.peso, 'kg')} />
-          <Dato label="Talla" valor={conUnidad(paciente.talla, 'm')} />
+          <Dato label="Talla" valor={tallaEnMetros ? `${tallaEnMetros} m` : null} />
           <Dato label="IMC" valor={conUnidad(paciente.imc, 'kg/m²')} />
         </div>
 
@@ -122,19 +125,16 @@ export default function PatientSummary({ paciente }) {
         {/* Laboratorio */}
         <SectionHeader icono={FlaskConical} titulo="Exámenes de laboratorio" />
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <Dato label="Colesterol total" valor={conUnidad(paciente.c_total, 'mg/dL')} />
           <Dato label="Creatinina" valor={conUnidad(paciente.creatinina, 'mg/dL')} />
           <Dato label="Glucosa" valor={conUnidad(paciente.glucosa, 'mg/dL')} />
           <Dato label="HDL" valor={conUnidad(paciente.hdl, 'mg/dL')} />
           <Dato label="LDL" valor={conUnidad(paciente.ldl, 'mg/dL')} />
           <Dato label="Triglicéridos" valor={conUnidad(paciente.trigliceridos, 'mg/dL')} />
-          <Dato label="TFG" valor={conUnidad(paciente.TFG, 'mL/min/1.73m²')} />
           <Dato label="Hemoglobina" valor={conUnidad(paciente.hemoglobina, 'g/dL')} />
-          <Dato label="Hematocrito" valor={conUnidad(paciente.hematocrito, '%')} />
           <Dato label="Leucocitos" valor={conUnidad(paciente.leucocitos, '10³/µL')} />
-          <Dato label="Linfocitos" valor={conUnidad(paciente.linfocitos, '%')} />
-          <Dato label="Granulocitos" valor={conUnidad(paciente.granulocitos, '%')} />
           <Dato label="Plaquetas" valor={conUnidad(paciente.plaquetas, '10³/µL')} />
-          <Dato label="Células medias" valor={conUnidad(paciente.celulas_medias, 'fL')} />
+          <Dato label="TFG" valor={conUnidad(paciente.TFG, 'mL/min/1.73m²')} />
         </div>
 
         {/* Opcionales Framingham extra si están presentes */}
@@ -143,7 +143,7 @@ export default function PatientSummary({ paciente }) {
             <Separador />
             <SectionHeader icono={Droplets} titulo="Datos adicionales Framingham" />
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <Dato label="Colesterol total" valor={conUnidad(paciente.colesterol_total_mgdl, 'mg/dL')} />
+              <Dato label="Colesterol total (Framingham)" valor={conUnidad(paciente.colesterol_total_mgdl, 'mg/dL')} />
             </div>
           </>
         )}

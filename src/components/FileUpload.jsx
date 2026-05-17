@@ -1,4 +1,4 @@
-// FileUpload.jsx (corregido)
+// FileUpload.jsx - adaptado a 19 campos obligatorios + 4 opcionales Framingham
 import { useState, useRef } from 'react'
 import {
   Upload, X, AlertCircle, FileJson, File, CheckCircle,
@@ -6,23 +6,21 @@ import {
 } from 'lucide-react'
 import { usePredictionContext } from '../context/PredictionContext'
 
+// 19 campos obligatorios del modelo (coinciden con input_schema.py)
 const ETIQUETAS_OBLIGATORIOS = {
-  creatinina: 'Creatinina (mg/dL)',
-  celulas_medias: 'Células medias VCM (fL)',
-  glucosa: 'Glucosa (mg/dL)',
-  granulocitos: 'Granulocitos (%)',
-  hdl: 'HDL (mg/dL)',
-  hematocrito: 'Hematocrito (%)',
+  c_total: 'Colesterol total (mg/dL)',
+  creatinina: 'Creatinina sérica (mg/dL)',
+  glucosa: 'Glucosa en ayunas (mg/dL)',
+  hdl: 'Colesterol HDL (mg/dL)',
   hemoglobina: 'Hemoglobina (g/dL)',
-  ldl: 'LDL (mg/dL)',
+  ldl: 'Colesterol LDL (mg/dL)',
   leucocitos: 'Leucocitos (10³/µL)',
-  linfocitos: 'Linfocitos (%)',
   plaquetas: 'Plaquetas (10³/µL)',
   trigliceridos: 'Triglicéridos (mg/dL)',
   edad: 'Edad (años)',
   sexo: 'Sexo (0=Mujer, 1=Hombre)',
   zona: 'Zona (0=Rural, 1=Urbana)',
-  ap_hipertension: 'Antecedente HTA (0/1)',
+  ap_hipertension: 'Antecedente personal de HTA (0/1)',
   ta_sistolica: 'Presión sistólica (mmHg)',
   ta_diastolica: 'Presión diastólica (mmHg)',
   peso: 'Peso (kg)',
@@ -31,17 +29,15 @@ const ETIQUETAS_OBLIGATORIOS = {
   TFG: 'TFG (mL/min/1.73m²)',
 }
 
+// Rangos de validación según input_schema.py
 const RANGOS = {
+  c_total: '50 – 500 mg/dL',
   creatinina: '0 – 2.0 mg/dL',
-  celulas_medias: '0 – 20 fL',
   glucosa: '25 – 492 mg/dL',
-  granulocitos: '0 – 100 %',
   hdl: '0 – 120 mg/dL',
-  hematocrito: '14 – 63 %',
   hemoglobina: '7 – 21 g/dL',
   ldl: '0 – 404.6 mg/dL',
   leucocitos: '0 – 50 10³/µL',
-  linfocitos: '0 – 100 %',
   plaquetas: '0 – 1000 10³/µL',
   trigliceridos: '0 – 420 mg/dL',
   edad: '6 – 110 años',
@@ -60,16 +56,13 @@ function validarCampo(campo, valor) {
   if (valor === undefined || valor === '') return null
   const n = parseFloat(valor)
   switch (campo) {
+    case 'c_total': return (n < 50 || n > 500) ? 'Debe estar entre 50 y 500 mg/dL' : null
     case 'creatinina': return (n < 0 || n > 2.0) ? 'Debe estar entre 0 y 2.0 mg/dL' : null
-    case 'celulas_medias': return (n < 0 || n > 20) ? 'Debe estar entre 0 y 20 fL' : null
     case 'glucosa': return (n < 25 || n > 492) ? 'Debe estar entre 25 y 492 mg/dL' : null
-    case 'granulocitos': return (n < 0 || n > 100) ? 'Debe estar entre 0 y 100 %' : null
     case 'hdl': return (n < 0 || n > 120) ? 'Debe estar entre 0 y 120 mg/dL' : null
-    case 'hematocrito': return (n < 14 || n > 63) ? 'Debe estar entre 14 y 63 %' : null
     case 'hemoglobina': return (n < 7 || n > 21) ? 'Debe estar entre 7 y 21 g/dL' : null
     case 'ldl': return (n < 0 || n > 404.6) ? 'Debe estar entre 0 y 404.6 mg/dL' : null
     case 'leucocitos': return (n < 0 || n > 50) ? 'Debe estar entre 0 y 50 10³/µL' : null
-    case 'linfocitos': return (n < 0 || n > 100) ? 'Debe estar entre 0 y 100 %' : null
     case 'plaquetas': return (n < 0 || n > 1000) ? 'Debe estar entre 0 y 1000 10³/µL' : null
     case 'trigliceridos': return (n < 0 || n > 420) ? 'Debe estar entre 0 y 420 mg/dL' : null
     case 'edad': return (n < 6 || n > 110) ? 'Debe estar entre 6 y 110 años' : null
@@ -167,9 +160,11 @@ export default function FileUpload({ onSubmit, loading }) {
       return
     }
 
+    // Construir payload con valores manuales + Framingham
     let payloadManual = { ...manualValues, ...framinghamValues }
+    // La talla se envía en cm (sin dividir) porque el backend espera cm
     if (payloadManual.talla !== undefined && payloadManual.talla !== '') {
-      payloadManual.talla = parseFloat(payloadManual.talla) / 100
+      payloadManual.talla = parseFloat(payloadManual.talla)
     }
     const finalManual = Object.fromEntries(
       Object.entries(payloadManual).filter(([, v]) => v !== '' && v !== undefined)

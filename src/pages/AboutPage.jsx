@@ -98,8 +98,8 @@ export default function AboutPage() {
         <SectionTitle><Layers size={20} className="text-blue-400" /> Arquitectura del sistema</SectionTitle>
         <div className="glass-card border border-white/5 rounded-2xl p-6">
           <p className="text-sm text-slate-300 mb-4">
-            El frontend React envía datos a una API REST en FastAPI. El backend ejecuta un pipeline de
-            <strong> StandardScaler → PCA → Random Forest</strong> para asignar al paciente uno de tres perfiles clínicos.
+            El frontend React envía datos a una API REST en FastAPI. El backend ejecuta un pipeline completo de
+            <strong> Winsorización experta → KNN Imputer → StandardScaler → PCA (11 componentes) → Random Forest</strong> para asignar al paciente uno de cuatro perfiles clínicos.
             Adicionalmente, el endpoint de explicabilidad utiliza <strong>SHAP (TreeExplainer)</strong> para calcular la contribución exacta
             de cada variable a la predicción.
           </p>
@@ -110,7 +110,7 @@ export default function AboutPage() {
             </div>
             <div className="bg-slate-800/50 rounded-xl p-4">
               <p className="text-xs font-semibold text-blue-300 uppercase mb-2">Backend</p>
-              <p className="text-sm text-slate-400">FastAPI · Random Forest · PCA · SHAP · PyMuPDF · pdfplumber · Pydantic v2</p>
+              <p className="text-sm text-slate-400">FastAPI · Random Forest · PCA · KNN Imputer · SHAP · PyMuPDF · pdfplumber · Pydantic v2</p>
             </div>
           </div>
         </div>
@@ -121,11 +121,11 @@ export default function AboutPage() {
         <SectionTitle><Activity size={20} className="text-blue-400" /> Flujo de datos</SectionTitle>
         <div className="glass-card border border-white/5 rounded-2xl divide-y divide-white/5">
           <FeatureRow icono={Monitor} titulo="1. Entrada de datos"
-            descripcion="El médico ingresa 22 variables clínicas manualmente o sube una historia clínica en JSON/PDF." />
+            descripcion="El médico ingresa 19 variables clínicas manualmente o sube una historia clínica en JSON/PDF." />
           <FeatureRow icono={Server} titulo="2. Validación y preprocesamiento"
-            descripcion="FastAPI valida los datos con Pydantic, aplica winsorización de valores atípicos y escala las variables." />
+            descripcion="FastAPI valida los datos con Pydantic, aplica winsorización de valores atípicos según rangos clínicos, imputación KNN y estandarización." />
           <FeatureRow icono={Brain} titulo="3. Predicción por clustering"
-            descripcion="El pipeline PCA + Random Forest asigna al paciente a uno de tres perfiles: Cardio-renal, Cardiovascular Inflamatorio o Bajo Riesgo, con probabilidades." />
+            descripcion="El pipeline PCA + Random Forest asigna al paciente a uno de cuatro perfiles: Cardiovascular, Bajo riesgo, Cardiometabólico o Cardiorrenal, con probabilidades." />
           <FeatureRow icono={Sparkles} titulo="4. Explicabilidad SHAP"
             descripcion="Opcionalmente, el médico puede solicitar una explicación detallada de la predicción mediante SHAP, que muestra cómo cada variable contribuyó positiva o negativamente a la asignación del perfil." />
           <FeatureRow icono={Monitor} titulo="5. Visualización de resultados"
@@ -149,7 +149,7 @@ export default function AboutPage() {
               <tr>
                 <td className="px-4 py-3 text-blue-400 font-mono text-xs">POST</td>
                 <td className="px-4 py-3 text-slate-300 font-mono text-xs">/api/predict</td>
-                <td className="px-4 py-3 text-slate-400 text-xs">Predicción desde formulario manual (22 campos).</td>
+                <td className="px-4 py-3 text-slate-400 text-xs">Predicción desde formulario manual (19 campos).</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 text-purple-400 font-mono text-xs">POST</td>
@@ -181,22 +181,22 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Interpretación de resultados (actualizado con SHAP) */}
+      {/* Interpretación de resultados */}
       <section className="animate-slide-up delay-400">
         <SectionTitle><Brain size={20} className="text-blue-400" /> Interpretación de resultados</SectionTitle>
         <div className="glass-card border border-white/5 rounded-2xl divide-y divide-white/5">
           <FeatureRow icono={BarChart2} titulo="Probabilidades por perfil clínico"
-            descripcion="El modelo devuelve la probabilidad de pertenencia a cada uno de los tres clusters, permitiendo al médico evaluar la incertidumbre de la clasificación." />
+            descripcion="El modelo devuelve la probabilidad de pertenencia a cada uno de los cuatro clusters (Cardiovascular, Bajo riesgo, Cardiometabólico, Cardiorrenal), permitiendo al médico evaluar la incertidumbre de la clasificación." />
           <FeatureRow icono={Sparkles} titulo="Explicabilidad SHAP"
             descripcion="SHAP (SHapley Additive exPlanations) desglosa la contribución individual de cada variable a la predicción, destacando qué factores empujaron al paciente hacia un perfil u otro. Se visualiza con un gráfico de barras interactivo." />
           <FeatureRow icono={CheckCircle} titulo="Perfiles clínicos definidos por expertos"
             descripcion="Cada cluster cuenta con una descripción e interpretación clínica validada que incluye recomendaciones específicas (manejo renal, control metabólico, etc.)." />
-          <FeatureRow icono={AlertTriangle} titulo="Datos reales colombianos"
-            descripcion="El modelo fue entrenado con datos de pacientes colombianos, ofreciendo predicciones más relevantes para el contexto local." />
+          <FeatureRow icono={AlertTriangle} titulo="Datos reales colombianos + validación externa"
+            descripcion="El modelo fue entrenado con datos de pacientes colombianos y validado con una cohorte externa anónima, ofreciendo predicciones más relevantes para el contexto local." />
         </div>
       </section>
 
-      {/* Stack */}
+      {/* Stack tecnológico */}
       <section className="animate-slide-up delay-500">
         <SectionTitle><Code2 size={20} className="text-blue-400" /> Stack tecnológico</SectionTitle>
         <div className="space-y-6">
@@ -206,6 +206,7 @@ export default function AboutPage() {
               <StackBadge nombre="FastAPI" version="0.115" categoria="backend" />
               <StackBadge nombre="scikit-learn" version="1.6" categoria="backend" />
               <StackBadge nombre="Random Forest" version="—" categoria="backend" />
+              <StackBadge nombre="KNN Imputer" version="—" categoria="backend" />
               <StackBadge nombre="Pydantic v2" version="2.10" categoria="backend" />
               <StackBadge nombre="PyMuPDF" version="1.24" categoria="backend" />
               <StackBadge nombre="pdfplumber" version="0.11" categoria="backend" />
@@ -240,6 +241,7 @@ export default function AboutPage() {
               <StackBadge nombre="joblib" version="1.4" categoria="ml" />
               <StackBadge nombre="PCA" version="—" categoria="ml" />
               <StackBadge nombre="K-Means" version="—" categoria="ml" />
+              <StackBadge nombre="Isolation Forest" version="—" categoria="ml" />
             </div>
           </div>
         </div>

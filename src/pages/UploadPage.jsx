@@ -3,7 +3,6 @@ import { predecirDesdeJson, predecirDesdePdf, predecirExplain } from '../api/car
 import FileUpload from '../components/FileUpload'
 import PatientSummary from '../components/PatientSummary'
 import ResultCard from '../components/ResultCard'
-import ExplainabilityChart from '../components/ExplainabilityChart'
 import ComparisonCard from '../components/ComparisonCard'
 import SHAPChart from '../components/SHAPChart'
 import { AlertCircle, RotateCcw } from 'lucide-react'
@@ -127,8 +126,6 @@ export default function UploadPage() {
               riesgoComparativo={result.riesgo_comparativo}
             />
           )}
-
-          <ExplainabilityChart probabilidades={result.probabilities} />
 
           {/* ─── Explicación SHAP ─────────────────────────────── */}
           {explain.loading && (

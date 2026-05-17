@@ -3,7 +3,6 @@ import { AlertCircle, RotateCcw } from 'lucide-react'
 import PredictionForm from '../components/PredictionForm'
 import PatientSummary from '../components/PatientSummary'
 import ResultCard from '../components/ResultCard'
-import ExplainabilityChart from '../components/ExplainabilityChart'
 import ComparisonCard from '../components/ComparisonCard'
 import SHAPChart from '../components/SHAPChart'
 import { usePredictionContext } from '../context/PredictionContext'
@@ -115,7 +114,6 @@ export default function ManualPage() {
           {result.riesgo_comparativo && (
             <ComparisonCard riesgoComparativo={result.riesgo_comparativo} />
           )}
-          <ExplainabilityChart probabilidades={result.probabilities} />
           
           {/* ─── Explicación SHAP ─────────────────────────────── */}
           {explain.loading && (
