@@ -1,4 +1,4 @@
-// cardioApi.js
+// cardioApi.js — modelo final k=4 (notebook_proy_final)
 
 import axios from 'axios'
 
@@ -8,6 +8,7 @@ const api = axios.create({
 })
 
 export async function predecirManual(datos) {
+  // datos.talla llega en cm — el backend lo convierte a metros en preprocessing.py
   const { data } = await api.post('/api/predict/', datos)
   return data
 }
@@ -21,10 +22,7 @@ export async function predecirDesdeJson(archivo, camposManuales = {}) {
     if (v !== '' && v !== undefined) params.append(k, v)
   })
 
-  const url = params.toString()
-    ? `/api/upload?${params.toString()}`
-    : '/api/upload'
-
+  const url = params.toString() ? `/api/upload?${params.toString()}` : '/api/upload'
   const { data } = await api.post(url, formData)
   return data
 }
@@ -38,16 +36,13 @@ export async function predecirDesdePdf(archivos, camposManuales = {}) {
     if (v !== '' && v !== undefined) params.append(k, v)
   })
 
-  const url = params.toString()
-    ? `/api/upload/pdf?${params.toString()}`
-    : '/api/upload/pdf'
-
+  const url = params.toString() ? `/api/upload/pdf?${params.toString()}` : '/api/upload/pdf'
   const { data } = await api.post(url, formData)
   return data
 }
 
-// ─── NUEVA: Endpoint de explicabilidad SHAP ────────────────────────────────
 export async function predecirExplain(datos) {
+  // Mismo payload que predecirManual — el endpoint devuelve SHAP values por cluster
   const { data } = await api.post('/api/predict/explain', datos)
   return data
 }
