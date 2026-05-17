@@ -2,13 +2,13 @@
 
 Interfaz web del sistema de predicción de riesgo cardiovascular con perfilamiento clínico para médicos.
 
-Desarrollado por Sebastián Torres Ortega, Mayerlis Acosta Peralta como proyecto integrador de Ingeniería de Sistemas e Ingeniería Biomédica.
+Desarrollado por Sebastián Torres Ortega y Mayerlis Acosta Peralta como proyecto integrador de Ingeniería de Sistemas e Ingeniería Biomédica.
 
 ---
 
 ## ¿Qué hace esta interfaz?
 
-Permite a un médico ingresar los datos de un paciente de dos formas, enviarlos al backend y recibir un perfil clínico — **Cardio‑renal**, **Cardiovascular Inflamatorio** o **Bajo Riesgo** — junto con las probabilidades de pertenencia a cada perfil y una descripción interpretativa. Opcionalmente muestra la comparativa con los índices Framingham 2008 y SCC si se proporcionan datos adicionales.
+Permite a un médico ingresar los datos de un paciente de dos formas, enviarlos al backend y recibir un perfil clínico — **Cardiovascular**, **Bajo riesgo**, **Cardiometabólico** o **Cardiorrenal** — junto con las probabilidades de pertenencia a cada uno de los 4 perfiles y una descripción interpretativa. Opcionalmente muestra la comparativa con los índices Framingham 2008 y SCC si se proporcionan datos adicionales.
 
 ---
 
@@ -21,7 +21,7 @@ Permite a un médico ingresar los datos de un paciente de dos formas, enviarlos 
 | Tailwind CSS | 4.x | Estilos utilitarios |
 | React Router DOM | 7.x | Navegación entre páginas |
 | Axios | 1.x | Llamadas HTTP al backend |
-| Recharts | 2.x | Gráficos de probabilidades por perfil |
+| Recharts | 2.x | Gráficos de probabilidades y SHAP waterfall |
 | Lucide React | 0.x | Iconos SVG |
 
 ---
@@ -73,16 +73,16 @@ En producción cambiar `VITE_API_URL` a la URL del servidor desplegado. Esta var
 Pantalla de bienvenida con las opciones de predicción y las características del sistema.
 
 ### `/manual` — Formulario manual
-Formulario con las 22 variables clínicas organizadas en secciones: datos demográficos, laboratorio, signos vitales y antropometría. Incluye campos opcionales para Framingham y SCC.
+Formulario con las 19 variables clínicas obligatorias organizadas en secciones: datos demográficos, antecedentes, laboratorio, signos vitales y antropometría. Incluye auto-cálculo de IMC y campos opcionales para Framingham y SCC. La talla se ingresa en cm y el backend realiza la conversión a metros internamente.
 
 ### `/upload` — Cargar historia clínica
-Área de drag-and-drop que acepta archivos JSON o PDF. Si el archivo tiene campos faltantes los lista con inputs para completarlos manualmente antes de confirmar.
+Área de drag-and-drop que acepta archivos JSON o PDF (hasta 5 PDFs simultáneos). Si el archivo tiene campos faltantes los lista con inputs para completarlos manualmente antes de confirmar.
 
 ### `/about` — Acerca del sistema
 Información sobre el proyecto, el equipo y el modelo utilizado.
 
 ### `/risk-models` — Modelos de riesgo
-Descripción de los perfiles clínicos y los índices de riesgo Framingham y SCC.
+Descripción de los 4 perfiles clínicos y los índices de riesgo Framingham y SCC.
 
 ---
 
@@ -90,9 +90,9 @@ Descripción de los perfiles clínicos y los índices de riesgo Framingham y SCC
 
 Ambos flujos muestran al final:
 
-**ResultCard** — tarjeta con el perfil clínico asignado, las probabilidades por perfil con barras visuales y una descripción interpretativa.
+**ResultCard** — tarjeta con el perfil clínico asignado, 4 barras de probabilidad animadas con colores diferenciados por cluster (naranja = Cardiovascular, verde = Bajo riesgo, amarillo = Cardiometabólico, rojo = Cardiorrenal), porcentaje de confianza y botón de explicación SHAP.
 
-**ExplainabilityChart** — gráfico de barras con las probabilidades por cluster.
+**SHAPChart** — gráfico waterfall interactivo con selector de los 4 perfiles. Muestra la contribución de cada variable al score del perfil en log-odds, partiendo del valor base. Las barras rojas aumentan la probabilidad del perfil y las verdes la reducen.
 
 **ComparisonCard** — comparativa con Framingham 2008 y SCC (solo si se proporcionaron los datos opcionales).
 
@@ -102,21 +102,19 @@ Ambos flujos muestran al final:
 
 ## Estructura del proyecto
 
-```
 src/
 ├── api/
 │   └── cardioApi.js              ← Todas las llamadas HTTP al backend
 ├── components/
 │   ├── ComparisonCard.jsx        ← Comparativa Framingham / SCC
-│   ├── ExplainabilityChart.jsx   ← Gráfico de probabilidades por perfil
 │   ├── FileUpload.jsx            ← Carga de JSON y PDF
 │   ├── Navbar.jsx                ← Barra de navegación
 │   ├── PatientSummary.jsx        ← Resumen de datos del paciente
-│   ├── PredictionForm.jsx        ← Formulario de ingreso manual (22 campos)
-│   ├── ResultCard.jsx            ← Perfil clínico + probabilidades
-│   └── SHAPChart.jsx             ← Gráfico SHAP auxiliar
+│   ├── PredictionForm.jsx        ← Formulario manual (19 obligatorios + 4 opcionales)
+│   ├── ResultCard.jsx            ← Perfil clínico + 4 barras de probabilidad
+│   └── SHAPChart.jsx             ← Waterfall SHAP interactivo por perfil
 ├── context/
-│   └── PredictionContext.jsx     ← Estado global del ciclo de predicción
+│   └── PredictionContext.jsx     ← Estado global (manual, upload, explain)
 ├── pages/
 │   ├── AboutPage.jsx
 │   ├── HomePage.jsx
@@ -126,7 +124,6 @@ src/
 ├── App.jsx                       ← Router + layout global
 ├── main.jsx                      ← Punto de entrada
 └── index.css                     ← Imports de Tailwind
-```
 
 ---
 
@@ -172,10 +169,10 @@ El ejecutable final queda en `cardio-backend/dist/CardioPredictor.exe`.
 2. Añadir la ruta en `src/App.jsx`
 3. Añadir el enlace en `src/components/Navbar.jsx` si corresponde
 
-**Agregar un nuevo campo al formulario:**  
-Modificar `src/components/PredictionForm.jsx` y `src/api/cardioApi.js` únicamente.
+**Agregar un nuevo campo al formulario:**
+Modificar `src/components/PredictionForm.jsx` y `src/context/PredictionContext.jsx` (campo en `FIELDS_INICIALES`).
 
-**Cambiar la URL del backend:**  
+**Cambiar la URL del backend:**
 Modificar solo el archivo `.env`.
 
 ---
@@ -185,3 +182,4 @@ Modificar solo el archivo `.env`.
 - El archivo `.env` nunca se sube a Git. Usar `.env.example` como plantilla.
 - La carpeta `dist/` generada por `npm run build` no se sube a Git. Se genera localmente antes de cada build del ejecutable.
 - El proxy de `vite.config.js` solo aplica en desarrollo. En producción (y en el ejecutable) el frontend llama directamente a la URL del backend.
+- La talla siempre se envía en cm desde el frontend. La conversión a metros ocurre en `preprocessing.py` del backend.
