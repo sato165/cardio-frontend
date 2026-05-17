@@ -1,3 +1,4 @@
+// PredictionForm.jsx
 import { useState } from 'react'
 import { Info, Send, User, Heart, FlaskConical, Activity, Ruler, ArrowRight, MapPin, Clock } from 'lucide-react'
 import { usePredictionContext } from '../context/PredictionContext'
@@ -12,7 +13,7 @@ const CAMPOS_INICIALES = {
   // Signos vitales y antropometría
   ta_sistolica: '', ta_diastolica: '', peso: '', talla: '', imc: '', TFG: '',
   // Opcionales Framingham
-  colesterol_total_mgdl: '', diabetes: '', tratamiento_antihipertensivo: '', fuma: ''
+  diabetes: '', tratamiento_antihipertensivo: '', fuma: ''
 }
 
 // ── Componentes de UI ───────────────────────────────────────────────────────
@@ -162,11 +163,6 @@ function validar(campos) {
   if (!campos.TFG) e.TFG = 'Requerido'
   else if (n(campos.TFG) < 11.47 || n(campos.TFG) > 197.39) e.TFG = '11.47 – 197.39 mL/min/1.73m²'
 
-  // Opcionales Framingham
-  if (campos.colesterol_total_mgdl !== '' &&
-      (n(campos.colesterol_total_mgdl) < 50 || n(campos.colesterol_total_mgdl) > 500))
-    e.colesterol_total_mgdl = '50 – 500 mg/dL'
-
   return e
 }
 
@@ -227,7 +223,6 @@ export default function PredictionForm({ onSubmit, loading, backendErrors = {}, 
     }
 
     // Opcionales Framingham solo si tienen valor
-    if (campos.colesterol_total_mgdl !== '')        payload.colesterol_total_mgdl        = parseFloat(campos.colesterol_total_mgdl)
     if (campos.diabetes !== '')                     payload.diabetes                     = parseInt(campos.diabetes)
     if (campos.tratamiento_antihipertensivo !== '') payload.tratamiento_antihipertensivo = parseInt(campos.tratamiento_antihipertensivo)
     if (campos.fuma !== '')                         payload.fuma                         = parseInt(campos.fuma)
@@ -366,11 +361,6 @@ export default function PredictionForm({ onSubmit, loading, backendErrors = {}, 
             de la Sociedad Colombiana de Cardiología.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <InputField
-              label="Colesterol total (Framingham)" name="colesterol_total_mgdl"
-              value={campos.colesterol_total_mgdl} onChange={handleChange}
-              error={getError('colesterol_total_mgdl')} hint="mg/dL" range="50 – 500" min={50} max={500}
-            />
             <SelectField
               label="Diabetes" name="diabetes" value={campos.diabetes} onChange={handleChange}
               options={[{ value: '1', label: 'Sí' }, { value: '0', label: 'No' }]}

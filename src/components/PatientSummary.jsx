@@ -1,3 +1,4 @@
+// PatientSummary.jsx
 import { User, Activity, Heart, FlaskConical, MapPin, Ruler, Scale, Droplets } from 'lucide-react'
 
 function SectionHeader({ titulo, icono }) {
@@ -136,17 +137,6 @@ export default function PatientSummary({ paciente }) {
           <Dato label="Plaquetas" valor={conUnidad(paciente.plaquetas, '10³/µL')} />
           <Dato label="TFG" valor={conUnidad(paciente.TFG, 'mL/min/1.73m²')} />
         </div>
-
-        {/* Opcionales Framingham extra si están presentes */}
-        {paciente.colesterol_total_mgdl != null && (
-          <>
-            <Separador />
-            <SectionHeader icono={Droplets} titulo="Datos adicionales Framingham" />
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <Dato label="Colesterol total (Framingham)" valor={conUnidad(paciente.colesterol_total_mgdl, 'mg/dL')} />
-            </div>
-          </>
-        )}
       </div>
     </div>
   )
