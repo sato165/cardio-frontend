@@ -33,7 +33,6 @@ function FeatureRow({ variable, tipo, unidad, descripcion }) {
   return (
     <tr className="border-b border-white/5 last:border-0">
       <td className="px-3 py-2"><code className="text-xs bg-slate-800 text-blue-400 px-2 py-1 rounded font-mono">{variable}</code></td>
-      <td className="px-3 py-2 text-xs text-slate-500">{tipo}{unidad ? ` (${unidad})` : ''}</td>
       <td className="px-3 py-2 text-sm text-slate-400">{descripcion}</td>
     </tr>
   )
@@ -59,7 +58,7 @@ export default function RiskModelsPage() {
     <div className="max-w-4xl mx-auto space-y-12 animate-slide-up">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold text-white mb-3">
-          Modelos de Predicción de Riesgo Cardiovascular
+          Modelos de predicción de riesgo cardiovascular
         </h1>
         <p className="text-slate-400 max-w-2xl mx-auto">
           El sistema utiliza un modelo de clustering con IA entrenado en datos reales colombianos,
@@ -68,16 +67,15 @@ export default function RiskModelsPage() {
         </p>
       </div>
 
-      {/* CardioPredict – modelo final del notebook */}
+      {/* Artery VA – modelo final del notebook */}
       <ModelDetailCard 
-        titulo="1. CardioPredict – Clustering con Random Forest"
-        icono={Cpu}
+        titulo="1. Artery VA"
+        icono={Heart}
         colorClass="border-blue-500/30"
       >
         <p className="text-sm text-slate-300 mb-4">
-          Modelo basado en <strong>Random Forest</strong> entrenado con un dataset real de pacientes colombianos
-          (sin variable objetivo). Se crearon <strong>4 clusters clínicos</strong> mediante <strong>K-Means + PCA</strong>,
-          que sirven como "objetivo" para el clasificador supervisado.
+          Modelo de inteligencia artificial entrenado con datos clínicos reales de pacientes colombianos, diseñado para identificar patrones asociados al riesgo cardiovascular y apoyar la estratificación clínica de los pacientes mediante análisis predictivo.
+
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
@@ -88,36 +86,35 @@ export default function RiskModelsPage() {
                 <thead className="bg-slate-800/60">
                   <tr>
                     <th className="px-3 py-2 text-left text-slate-400">Variable</th>
-                    <th className="px-3 py-2 text-left text-slate-400">Tipo</th>
                     <th className="px-3 py-2 text-left text-slate-400">Descripción</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <FeatureRow variable="c_total" tipo="Numérica" unidad="mg/dL" descripcion="Colesterol total." />
-                  <FeatureRow variable="creatinina" tipo="Numérica" unidad="mg/dL" descripcion="Función renal." />
-                  <FeatureRow variable="glucosa" tipo="Numérica" unidad="mg/dL" descripcion="Glicemia en ayunas." />
-                  <FeatureRow variable="hdl" tipo="Numérica" unidad="mg/dL" descripcion="Colesterol HDL." />
-                  <FeatureRow variable="hemoglobina" tipo="Numérica" unidad="g/dL" descripcion="Hemoglobina." />
-                  <FeatureRow variable="ldl" tipo="Numérica" unidad="mg/dL" descripcion="Colesterol LDL." />
-                  <FeatureRow variable="leucocitos" tipo="Numérica" unidad="10³/µL" descripcion="Leucocitos." />
-                  <FeatureRow variable="plaquetas" tipo="Numérica" unidad="10³/µL" descripcion="Plaquetas." />
-                  <FeatureRow variable="trigliceridos" tipo="Numérica" unidad="mg/dL" descripcion="Triglicéridos." />
-                  <FeatureRow variable="edad" tipo="Numérica" unidad="años" descripcion="Edad del paciente." />
-                  <FeatureRow variable="sexo" tipo="Binaria" descripcion="0 = Mujer, 1 = Hombre." />
-                  <FeatureRow variable="zona" tipo="Binaria" descripcion="0 = Rural, 1 = Urbana." />
-                  <FeatureRow variable="ap_hipertension" tipo="Binaria" descripcion="Antecedente personal de HTA." />
-                  <FeatureRow variable="ta_sistolica" tipo="Numérica" unidad="mmHg" descripcion="Presión sistólica." />
-                  <FeatureRow variable="ta_diastolica" tipo="Numérica" unidad="mmHg" descripcion="Presión diastólica." />
-                  <FeatureRow variable="peso" tipo="Numérica" unidad="kg" descripcion="Peso corporal." />
-                  <FeatureRow variable="talla" tipo="Numérica" unidad="m" descripcion="Talla en metros." />
-                  <FeatureRow variable="imc" tipo="Numérica" unidad="kg/m²" descripcion="Índice de masa corporal." />
-                  <FeatureRow variable="TFG" tipo="Numérica" unidad="mL/min/1.73m²" descripcion="Filtración glomerular." />
+                  <FeatureRow variable="c_total" descripcion="Colesterol total." />
+<FeatureRow variable="creatinina" descripcion="Función renal." />
+<FeatureRow variable="glucosa" descripcion="Glicemia en ayunas." />
+<FeatureRow variable="hdl" descripcion="Colesterol HDL." />
+<FeatureRow variable="hemoglobina" descripcion="Hemoglobina." />
+<FeatureRow variable="ldl" descripcion="Colesterol LDL." />
+<FeatureRow variable="leucocitos" descripcion="Leucocitos." />
+<FeatureRow variable="plaquetas" descripcion="Plaquetas." />
+<FeatureRow variable="trigliceridos" descripcion="Triglicéridos." />
+<FeatureRow variable="edad" descripcion="Edad del paciente." />
+<FeatureRow variable="sexo" descripcion="0 = Mujer, 1 = Hombre." />
+<FeatureRow variable="zona" descripcion="0 = Rural, 1 = Urbana." />
+<FeatureRow variable="ap_hipertension" descripcion="Antecedente personal de HTA." />
+<FeatureRow variable="ta_sistolica" descripcion="Presión sistólica." />
+<FeatureRow variable="ta_diastolica" descripcion="Presión diastólica." />
+<FeatureRow variable="peso" descripcion="Peso corporal." />
+<FeatureRow variable="talla" descripcion="Talla en metros." />
+<FeatureRow variable="imc" descripcion="Índice de masa corporal." />
+<FeatureRow variable="TFG" descripcion="Filtración glomerular." />
                 </tbody>
               </table>
             </div>
           </div>
           <div>
-            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Perfiles clínicos (clusters – k=4)</h4>
+            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Perfiles clínicos</h4>
             <div className="glass-card border border-white/5 rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-red-500" />
@@ -132,12 +129,12 @@ export default function RiskModelsPage() {
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-yellow-500" />
                 <span className="text-sm text-slate-300 font-medium">Cardiometabólico:</span>
-                <span className="text-xs text-slate-400">Resistencia metabólica + perfil lipídico alterado.</span>
+                <span className="text-xs text-slate-400">Perfil lipídico alterado.</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-purple-500" />
                 <span className="text-sm text-slate-300 font-medium">Cardiorrenal:</span>
-                <span className="text-xs text-slate-400">Disfunción renal + alteración lipídica.</span>
+                <span className="text-xs text-slate-400">Disfunción renal y/o alteración lipídica.</span>
               </div>
             </div>
             <div className="mt-4 glass-card border border-white/10 rounded-xl p-4">
@@ -185,7 +182,7 @@ export default function RiskModelsPage() {
 
       {/* Framingham 2008 */}
       <ModelDetailCard 
-        titulo="2. Framingham 2008 (D'Agostino)"
+        titulo="2. Framingham risk score classic 2008"
         icono={Heart}
         colorClass="border-red-500/30"
       >
@@ -221,8 +218,8 @@ export default function RiskModelsPage() {
 
       {/* SCC Colombia */}
       <ModelDetailCard 
-        titulo="3. Sociedad Colombiana de Cardiología (SCC)"
-        icono={Shield}
+        titulo="3. Sociedad colombiana de cardiologia & cirugía cardiovascular (SCC)"
+        icono={Heart}
         colorClass="border-yellow-500/30"
       >
         <p className="text-sm text-slate-300 mb-4">
@@ -245,7 +242,7 @@ export default function RiskModelsPage() {
         <SectionTitle icono={BarChart2}>Comparación entre modelos</SectionTitle>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
           <div className="text-center">
-            <span className="inline-block bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold mb-2">CardioPredict</span>
+            <span className="inline-block bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold mb-2">Artery VA</span>
             <p className="text-xs text-slate-400">Clustering con Random Forest sobre datos reales colombianos. Incluye explicabilidad SHAP.</p>
           </div>
           <div className="text-center">

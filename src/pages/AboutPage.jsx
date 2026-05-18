@@ -77,20 +77,13 @@ export default function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-12 pb-16">
       <div className="text-center pt-4 animate-slide-up">
-        <div className="relative inline-block mb-6">
-          <div className="absolute inset-0 bg-red-500/20 rounded-full blur-2xl" />
-          <div className="relative p-5 rounded-3xl glass-card">
-            <HeartPulse className="text-red-500 animate-heartbeat heart-glow" size={40} fill="currentColor" strokeWidth={2} />
-          </div>
-        </div>
-        <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">
-          Artery<span className="text-gradient-red">-VA</span>
+        <h1 className="text-8xl md:text-5xl font-black text-white leading-none tracking-tighter mb-4 text-center">
+          ARTERY      <span className="text-gradient-red">VA</span>
         </h1>
         <p className="text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
-          Sistema de predicción de riesgo cardiovascular basado en clustering con inteligencia artificial,
-          entrenado con datos reales de pacientes colombianos. Incluye explicabilidad SHAP para análisis detallado de cada predicción.
+          ARTERY-VA es un software de inteligencia artificial para la predicción y estratificación multiclase del riesgo cardiovascular mediante la identificación probabilística de fenotipos clínicos cardiovasculares.
         </p>
-        <p className="text-xs text-slate-500 mt-4">Universidad · 2026</p>
+        <p className="text-xs text-slate-500 mt-4"></p>
       </div>
 
       {/* Arquitectura */}
@@ -99,8 +92,8 @@ export default function AboutPage() {
         <div className="glass-card border border-white/5 rounded-2xl p-6">
           <p className="text-sm text-slate-300 mb-4">
             El frontend React envía datos a una API REST en FastAPI. El backend ejecuta un pipeline completo de
-            <strong> Winsorización experta → KNN Imputer → StandardScaler → PCA (11 componentes) → Random Forest</strong> para asignar al paciente uno de cuatro perfiles clínicos.
-            Adicionalmente, el endpoint de explicabilidad utiliza <strong>SHAP (TreeExplainer)</strong> para calcular la contribución exacta
+            para asignar al paciente uno de cuatro perfiles clínicos.
+            Adicionalmente, el endpoint de explicabilidad utiliza <strong> SHAP (TreeExplainer)</strong> para calcular la contribución exacta
             de cada variable a la predicción.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
@@ -251,8 +244,8 @@ export default function AboutPage() {
       <section className="animate-slide-up delay-500">
         <SectionTitle><Users size={20} className="text-blue-400" /> Equipo de desarrollo</SectionTitle>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <TeamCard nombre="Sebastián Torres Ortega" rol="Desarrollo backend, frontend e investigación" area="Ingeniería de Sistemas" />
-          <TeamCard nombre="Mayerlis Acosta Peralta" rol="Investigación y validación clínica" area="Ingeniería Biomédica" />
+          <TeamCard nombre="Sebastián Torres Ortega" area="Ingeniería de Sistemas y Computación" />
+          <TeamCard nombre="Mayerlis Acosta Peralta" area="Ingeniería Biomédica" />
         </div>
       </section>
     </div>

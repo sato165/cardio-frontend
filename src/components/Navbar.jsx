@@ -5,7 +5,7 @@ export default function Navbar() {
   const { pathname } = useLocation()
 
   const linkClass = (path) =>
-    `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative group ${
+    `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative group font ['Montserrat'] ${
       pathname === path
         ? 'text-white'
         : 'text-slate-400 hover:text-white'
@@ -20,15 +20,10 @@ export default function Navbar() {
           className="flex items-center gap-3 group"
         >
           <div className="relative">
-            <HeartPulse
-              className="text-red-500 animate-heartbeat"
-              size={24}
-              fill="currentColor"
-            />
             <div className="absolute inset-0 bg-red-500 blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
           </div>
           <span className="text-white font-bold text-lg tracking-tight">
-            Artery<span className="text-red-500">-VA</span>
+            A R T E R Y   <span className="text-red-800"> V A</span>
           </span>
         </Link>
 
@@ -50,7 +45,7 @@ export default function Navbar() {
                 <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-red-500 rounded-full" />
               )}
             </div>
-            <span>Historial</span>
+            <span>Cargar historial electrónico</span>
           </Link>
           
           <Link to="/models" className={linkClass('/models')}>

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+
 import { 
   ClipboardList, Upload, HeartPulse, ShieldCheck, FileText, 
   Sparkles, ArrowRight, Cpu, Activity, Brain, BarChart2,
@@ -11,48 +12,45 @@ export default function HomePage() {
   return (
     <div className="flex flex-col items-center">
 
-      {/* Hero Section - Impactante */}
-      <div className="relative text-center mt-8 mb-20 w-full">
-        {/* Glow effects de fondo */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl -z-10 animate-pulse" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-red-500/10 rounded-full blur-2xl -z-10" />
-        
-        {/* Icono animado */}
-        <div className="relative inline-block mb-6 animate-float">
-          <div className="absolute inset-0 bg-red-500/30 rounded-full blur-xl animate-ping" style={{ animationDuration: '2s' }} />
-          <div className="relative p-6 rounded-3xl bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-white/10 backdrop-blur-sm">
-            <HeartPulse className="text-red-500 animate-heartbeat" size={56} fill="currentColor" />
-          </div>
+      {/* Hero Section */}
+      <div className="relative w-full mt-12 mb-20">
+
+        <div className="flex justify-center gap-2 px-4 py-1.5 rounded-full border border-red-500/10 bg-red-500/10 mb-6 text-center">
+          <span className="text-red-400 text-xs font-semibold uppercase tracking-widest">
+            • Predicción • Decisión • Vida
+          </span>
         </div>
-        
-        <h1 className="text-6xl md:text-7xl font-bold text-white mb-4 tracking-tight bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-          Artery<span className="text-gradient-red">-VA</span>
+
+        <h1 className="text-8xl md:text-9xl font-black text-white leading-none tracking-tighter mb-4 text-center">
+          ARTERY     <span className="text-gradient-red">VA</span>
         </h1>
-        <p className="text-slate-300 text-xl max-w-2xl mx-auto leading-relaxed mb-8">
-          Predicción de riesgo cardiovascular con <strong className="text-blue-400">clustering avanzado</strong> 
-          y <strong className="text-purple-400">explicabilidad SHAP</strong> para la toma de decisiones clínicas.
+
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-5 max-w-xl mx-auto text-center">
+          Inteligencia artificial para la salud cardiovascular
+        </h2>
+
+        <p className="text-slate-400 text-base max-w-sm leading-relaxed mb-8 text-center mx-auto">
+          Potencia la toma de decisiones médicas con un software de analítica avanzada 
+          que identifica patrones críticos imperceptibles, optimizando la detección 
+          temprana de patologías coronarias en cada paciente.
         </p>
-        
-        {/* Badges reales del proyecto */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full glass-light border border-white/10 backdrop-blur-sm">
-            <Cpu size={16} className="text-blue-400" />
-            <span className="text-sm text-slate-200 font-medium">Random Forest</span>
-          </div>
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full glass-light border border-white/10 backdrop-blur-sm">
-            <Layers size={16} className="text-cyan-400" />
-            <span className="text-sm text-slate-200 font-medium">4 Clusters clínicos</span>
-          </div>
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full glass-light border border-white/10 backdrop-blur-sm">
-            <Brain size={16} className="text-purple-400" />
-            <span className="text-sm text-slate-200 font-medium">SHAP Explainability</span>
-          </div>
-          <div className="flex items-center gap-2 px-5 py-2.5 rounded-full glass-light border border-white/10 backdrop-blur-sm">
-            <Users size={16} className="text-green-400" />
-            <span className="text-sm text-slate-200 font-medium">Datos reales colombianos</span>
-          </div>
+
+        <div className="flex items-center gap-3 flex-wrap justify-center normal-case">
+          <div className="btn-primary px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 cursor-default normal-case">
+            Algoritmos con enfoque clínico
         </div>
+          <div className="btn-secondary px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 cursor-default">
+            Datos colombianos
+        </div>
+          <div className="btn-secondary px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 cursor-default">
+            Predicción
+        </div>
+          <div className="btn-secondary px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 cursor-default">
+          Explicabilidad
+        </div>
+
       </div>
+    </div>
 
       {/* Tarjetas de acción principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl mb-20">
@@ -72,7 +70,7 @@ export default function HomePage() {
               <ArrowRight className="text-slate-500 group-hover:text-blue-400 group-hover:translate-x-2 transition-all duration-300" size={24} />
             </div>
             
-            <h2 className="text-2xl font-bold text-white mb-3">Formulario Manual</h2>
+            <h2 className="text-2xl font-bold text-white mb-3">Formulario manual</h2>
             <p className="text-slate-400 text-sm leading-relaxed mb-4">
               Ingrese las <strong className="text-blue-300">19 variables clínicas</strong> del paciente campo por campo.
               Validación en tiempo real con rangos clínicos y mensajes de ayuda.
@@ -101,7 +99,7 @@ export default function HomePage() {
               <ArrowRight className="text-slate-500 group-hover:text-red-400 group-hover:translate-x-2 transition-all duration-300" size={24} />
             </div>
             
-            <h2 className="text-2xl font-bold text-white mb-3">Cargar Historia Clínica</h2>
+            <h2 className="text-2xl font-bold text-white mb-3">Cargar documentos electrónicos</h2>
             <p className="text-slate-400 text-sm leading-relaxed mb-4">
               Suba archivos <strong className="text-red-300">JSON o PDF</strong>. El sistema extrae automáticamente
               los datos mediante IA avanzada y solicita campos faltantes.
@@ -298,7 +296,7 @@ export default function HomePage() {
           animation: float 3s ease-in-out infinite;
         }
         .text-gradient-red {
-          background: linear-gradient(135deg, #ef4444, #f97316);
+          background: linear-gradient(135deg, #cf0404, #2e0404);
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;

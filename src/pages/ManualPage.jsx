@@ -68,7 +68,7 @@ export default function ManualPage() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="mb-8 text-center md:text-left">
         <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
-          Formulario Manual
+          Formulario manual
         </h1>
         <p className="text-slate-300 text-base max-w-2xl">
           Complete los datos clínicos del paciente. Todos los campos con <span className="text-red-400">*</span> son requeridos.

@@ -81,7 +81,7 @@ export default function UploadPage() {
     <div className="max-w-2xl mx-auto">
       <div className="mb-8 animate-slide-up">
         <h1 className="text-3xl font-bold text-white mb-2">
-          Cargar Historia Clínica
+          Cargar documentos electrónicos del paciente
         </h1>
         <p className="text-slate-400 text-sm">
           Suba un archivo JSON o uno o varios PDFs del mismo paciente.
